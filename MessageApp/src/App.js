@@ -1,6 +1,7 @@
 const express = require("express");
 const expressLayouts = require("express-ejs-layouts");
-const session = require('express-session'); 
+const session = require('express-session');
+const flash = require('connect-flash');
 const path = require('path');
 
 const authRoutes = require('./routes/authRoutes');
@@ -27,12 +28,14 @@ app.use(
     })
 );
 
+app.use(flash());
+
 // 4. GUNAKAN RUTE-RUTE
 app.get('/', (req, res) => {
 
-    if(req.session.userId){
+    if (req.session.userId) {
         res.redirect('/dashboard');
-    }else{
+    } else {
         res.redirect('/login');
     }
 });

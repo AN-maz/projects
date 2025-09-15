@@ -7,7 +7,7 @@ router.get('/register', isGuest, authController.showRegisterPage);
 router.post('/register', isGuest, authController.registerUser);
 
 router.get('/login', isGuest, authController.showLoginPage);
-router.get('/login', isGuest, authController.loginUser);
+router.post('/login', isGuest, authController.loginUser);
 
 router.get('/logout',authController.logoutUser);
 
