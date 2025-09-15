@@ -6,11 +6,20 @@ const path = require('path');
 
 const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const postRoutes = require('./routes/postRoutes')
+const profileRoutes = require('./routes/profileRoutes');    
+const User = require('./models/userModel');
 
 const app = express();
 
+app.use((req, res, next) => {
+    console.log(`Request Masuk: ${req.method} ${req.originalUrl}`);
+    next();
+});
+
 // 1. Middleware umum (wajib sebelum session dan rute)
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, '../public')));
 
 // 2. Pengaturan View Engine
 app.set('views', path.join(__dirname, 'views'));
@@ -30,6 +39,21 @@ app.use(
 
 app.use(flash());
 
+app.use((req,res,next) =>{
+    res.locals.messages = req.flash();
+    next();
+});
+
+app.use(async (req, res, next) => {
+    if (req.session.userId) {
+        const user = await User.findById(req.session.userId);
+        res.locals.user = user;
+    } else {
+        res.locals.user = null;
+    }
+    next();
+});
+
 // 4. GUNAKAN RUTE-RUTE
 app.get('/', (req, res) => {
 
@@ -40,7 +64,10 @@ app.get('/', (req, res) => {
     }
 });
 
+
 app.use(authRoutes);
 app.use(dashboardRoutes);
+app.use(postRoutes);
+app.use(profileRoutes);
 
 module.exports = app;

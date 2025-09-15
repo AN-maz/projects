@@ -1,3 +1,56 @@
-<h1>Selamat Datang di Dashboard!</h1>
-<p>Halaman ini hanya bisa diakses setelah Anda login.</p>
-<a href="/logout" class="btn btn-danger">Logout</a>
+<div class="card mb-4 shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title">Buat Postingan Baru</h5>
+        <form action="/posts" method="POST">
+            <div class="mb-3">
+                <textarea class="form-control" name="content" rows="3" placeholder="Apa yang kamu pikirkan?"
+                    required></textarea>
+            </div>
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary">Posting</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<h3 class="mb-3">Feed</h3>
+
+<% if (posts.length> 0) { %>
+    <% posts.forEach(post=> { %>
+        <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+
+                    <div class="fw-bold me-2">
+                        <% if (post.user) { %>
+                            <a href="/profile/<%= post.user.username %>" class="text-dark text-decoration-none">
+                                <%= post.user.username %>
+                            </a>
+                            <% } else { %>
+                                <span class="text-muted fst-italic">Pengguna Dihapus</span>
+                                <% } %>
+                    </div>
+
+                    <small class="text-muted">
+                        <%= post.createdAt.toLocaleString('id-ID') %>
+                    </small>
+                </div>
+
+                <p class="card-text">
+                    <%= post.content %>
+                </p>
+
+                <hr>
+
+                <div>
+                    <a href="#" class="btn btn-sm btn-outline-primary">Suka</a>
+                    <a href="#" class="btn btn-sm btn-outline-secondary">Komentar</a>
+                </div>
+            </div>
+        </div>
+        <% }) %>
+            <% } else { %>
+                <div class="text-center">
+                    <p>Belum ada postingan. Jadilah yang pertama!</p>
+                </div>
+                <% } %>

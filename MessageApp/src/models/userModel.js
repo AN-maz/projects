@@ -12,7 +12,25 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Password tidak boleh kosong MasPur!']
     },
-});
+
+    // TAMBAHAN BARU #1
+    bio: {
+        type: String,
+        default: 'Halo! Saya pengguna baru MessageApp'
+    },
+    profilePicture: {
+        type: String,
+        default: 'default-avatar.png'
+    },
+    followers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    following: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }]
+}, { timestamps: true });
 
 // HASHING PASSWORD
 UserSchema.pre('save', async function (next) {
