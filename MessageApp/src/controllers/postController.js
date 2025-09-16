@@ -6,17 +6,29 @@ exports.createPost = async (req, res) => {
         const { content } = req.body;
         const userId = req.session.userId;
 
-        const newPost = new Post({
-            content,
+        // 1. Siapkan data dalam objek JavaScript BIASA (bukan 'new Post')
+        const newPostData = {
+            content: content,
             user: userId
-        });
+        };
 
+        // 2. Cek apakah ada file, JIKA ADA, tambahkan ke objek BIASA tadi
+        if (req.file) {
+            newPostData.image = req.file.filename;
+        }
+
+        // 3. BARU SETELAH SEMUA DATA LENGKAP, buat dokumen Mongoose-nya
+        const newPost = new Post(newPostData);
+        
+        // 4. Simpan dokumennya ke database
         await newPost.save();
-
+        
         res.redirect('/dashboard');
     } catch (err) {
         console.error(err);
-        res.status(500).send('Server Error');
+        // Tambahkan flash message agar user tahu jika ada error
+        req.flash('error', 'Gagal membuat postingan.');
+        res.redirect('/dashboard');
     }
 };
 

@@ -1,11 +1,17 @@
 <div class="card mb-4 shadow-sm">
     <div class="card-body">
         <h5 class="card-title">Buat Postingan Baru</h5>
-        <form action="/posts" method="POST">
+        <form action="/posts" method="POST" enctype="multipart/form-data">
             <div class="mb-3">
                 <textarea class="form-control" name="content" rows="3" placeholder="Apa yang kamu pikirkan?"
                     required></textarea>
             </div>
+
+            <div class="mb-3">
+                <label for="postImage" class="form-label">Tambahkan Gambar (Opsional)</label>
+                <input class="form-control" type="file" id="postImage" name="postImage">
+            </div>
+
             <div class="text-end">
                 <button type="submit" class="btn btn-primary">Posting</button>
             </div>
@@ -18,44 +24,49 @@
 <% if (posts.length> 0) { %>
     <% posts.forEach((post, index)=> { %>
         <div class="card mb-3 shadow-sm">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-2">
-                    <div class="fw-bold me-2">
-                        <% if (post.user) { %>
-                            <a href="/profile/<%= post.user.username %>" class="text-dark text-decoration-none">
-                                <%= post.user.username %>
-                            </a>
-                            <% } else { %>
-                                <span class="text-muted fst-italic">Pengguna Dihapus</span>
-                                <% } %>
+
+            <% if (post.image) { %>
+                <div class="ratio ratio-1x1" style="max-width: 500px;"">
+                    <img src="/uploads/posts/<%= post.image %>" class="card-img-top" alt="Gambar Postingan">
+                </div>
+                <% } %>
+
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="fw-bold me-2">
+                                <% if (post.user) { %>
+                                    <a href="/profile/<%= post.user.username %>" class="text-dark text-decoration-none">
+                                        <%= post.user.username %>
+                                    </a>
+                                    <% } else { %>
+                                        <span class="text-muted fst-italic">Pengguna Dihapus</span>
+                                        <% } %>
+                            </div>
+                            <small class="text-muted">
+                                <%= post.createdAt.toLocaleString('id-ID') %>
+                            </small>
+                        </div>
+
+                        <p class="card-text">
+                            <%= post.content %>
+                        </p>
+
+                        <hr>
+                        <div class="d-flex align-items-center">
+                            <form class="like-form me-2" action="/posts/<%= post._id %>/like" method="POST"
+                                data-postid="<%= post._id %>">
+                                <% if (user && post.likes.map(id=> id.toString()).includes(user._id.toString())) { %>
+                                    <button type="submit" class="btn btn-sm btn-danger">Batal Suka</button>
+                                    <% } else { %>
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">Suka</button>
+                                        <% } %>
+                            </form>
+                            <a href="#" class="btn btn-sm btn-outline-secondary me-3">Komentar</a>
+                            <small class="text-muted" id="likes-count-<%= post._id %>">
+                                <%= post.likes.length %> Suka
+                            </small>
+                        </div>
                     </div>
-                    <small class="text-muted">
-                        <%= post.createdAt.toLocaleString('id-ID') %>
-                    </small>
-                </div>
-
-                <p class="card-text">
-                    <%= post.content %>
-                </p>
-
-                <hr>
-                <div class="d-flex align-items-center">
-                    <form class="like-form me-2" action="/posts/<%= post._id %>/like" method="POST"
-                        data-postid="<%= post._id %>">
-                        <% if (user && post.likes.map(id=> id.toString()).includes(user._id.toString())) { %>
-                            <button type="submit" class="btn btn-sm btn-danger">Batal Suka</button>
-                            <% } else { %>
-                                <button type="submit" class="btn btn-sm btn-outline-primary">Suka</button>
-                                <% } %>
-                    </form>
-
-                    <a href="#" class="btn btn-sm btn-outline-secondary me-3">Komentar</a>
-
-                    <small class="text-muted" id="likes-count-<%= post._id %>">
-                        <%= post.likes.length %> Suka
-                    </small>
-                </div>
-            </div>
         </div>
         <% }) %>
             <% } else { %>
