@@ -16,11 +16,10 @@
 <h3 class="mb-3">Feed</h3>
 
 <% if (posts.length> 0) { %>
-    <% posts.forEach(post=> { %>
+    <% posts.forEach((post, index)=> { %>
         <div class="card mb-3 shadow-sm">
             <div class="card-body">
                 <div class="d-flex align-items-center mb-2">
-
                     <div class="fw-bold me-2">
                         <% if (post.user) { %>
                             <a href="/profile/<%= post.user.username %>" class="text-dark text-decoration-none">
@@ -30,7 +29,6 @@
                                 <span class="text-muted fst-italic">Pengguna Dihapus</span>
                                 <% } %>
                     </div>
-
                     <small class="text-muted">
                         <%= post.createdAt.toLocaleString('id-ID') %>
                     </small>
@@ -41,10 +39,21 @@
                 </p>
 
                 <hr>
+                <div class="d-flex align-items-center">
+                    <form class="like-form me-2" action="/posts/<%= post._id %>/like" method="POST"
+                        data-postid="<%= post._id %>">
+                        <% if (user && post.likes.map(id=> id.toString()).includes(user._id.toString())) { %>
+                            <button type="submit" class="btn btn-sm btn-danger">Batal Suka</button>
+                            <% } else { %>
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Suka</button>
+                                <% } %>
+                    </form>
 
-                <div>
-                    <a href="#" class="btn btn-sm btn-outline-primary">Suka</a>
-                    <a href="#" class="btn btn-sm btn-outline-secondary">Komentar</a>
+                    <a href="#" class="btn btn-sm btn-outline-secondary me-3">Komentar</a>
+
+                    <small class="text-muted" id="likes-count-<%= post._id %>">
+                        <%= post.likes.length %> Suka
+                    </small>
                 </div>
             </div>
         </div>
