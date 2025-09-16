@@ -2,22 +2,50 @@
     <div class="card shadow-sm mb-4">
         <div class="card-body">
             <div class="row align-items-center">
+                
+                <!-- Bagian Avatar -->
                 <div class="col-md-3 text-center">
-                    <img src="/uploads/avatars/<%= profileUser.profilePicture %>" alt="Avatar" width="150" height="150" class="rounded-circle img-thumbnail">
+                    <img src="/uploads/avatars/<%= profileUser.profilePicture %>" 
+                         alt="Avatar" 
+                         width="150" 
+                         height="150" 
+                         class="rounded-circle img-thumbnail">
                 </div>
+
+                <!-- Bagian Info User -->
                 <div class="col-md-9">
+                    <!-- Username -->
                     <h2 class="mb-0"><%= profileUser.username %></h2>
+                    
+                    <!-- Bio -->
                     <p class="text-muted"><%= profileUser.bio %></p>
-                    <div class="d-flex">
+                    
+                    <!-- Statistik: Postingan, Pengikut, Mengikuti -->
+                    <div class="d-flex mb-3">
                         <div class="me-4"><strong><%= posts.length %></strong> Postingan</div>
                         <div class="me-4"><strong><%= profileUser.followers.length %></strong> Pengikut</div>
                         <div><strong><%= profileUser.following.length %></strong> Mengikuti</div>
                     </div>
-                    </div>
+
+                    <!-- Tombol Follow/Unfollow (hanya muncul kalau buka profil orang lain) -->
+                    <% if (user._id.toString() !== profileUser._id.toString()) { %>
+                        <form action="/profile/<%= profileUser._id %>/follow" method="POST">
+                            <% if (user.following.includes(profileUser._id)) { %>
+                                <!-- Kalau sudah follow -->
+                                <button type="submit" class="btn btn-secondary">Unfollow</button>
+                            <% } else { %>
+                                <!-- Kalau belum follow -->
+                                <button type="submit" class="btn btn-primary">Follow</button>
+                            <% } %>
+                        </form>
+                    <% } %>
+
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Daftar Postingan User -->
     <h4 class="mb-3">Postingan</h4>
     <div class="row row-cols-1 row-cols-md-3 g-4">
         <% if (posts.length > 0) { %>
@@ -25,15 +53,20 @@
                 <div class="col">
                     <div class="card h-100">
                         <div class="card-body">
+                            <!-- Konten postingan -->
                             <p class="card-text"><%= post.content %></p>
                         </div>
                         <div class="card-footer">
-                            <small class="text-muted"><%= post.createdAt.toLocaleString('id-ID') %></small>
+                            <!-- Tanggal posting -->
+                            <small class="text-muted">
+                                <%= post.createdAt.toLocaleString('id-ID') %>
+                            </small>
                         </div>
                     </div>
                 </div>
             <% }) %>
         <% } else { %>
+            <!-- Kalau belum ada postingan -->
             <p class="text-center text-muted">Pengguna ini belum memiliki postingan.</p>
         <% } %>
     </div>

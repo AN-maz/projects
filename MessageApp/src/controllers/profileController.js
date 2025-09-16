@@ -85,18 +85,18 @@ exports.updateBio = async (req, res) => {
 exports.searchUsers = async (req, res) => {
     try {
         const query = req.query.q;
-        if(!query){
-            return res.render('search-results',{
+        if (!query) {
+            return res.render('search-results', {
                 title: 'Cari Pengguna',
-                users:[],
+                users: [],
                 query: ''
             });
         }
         const users = await User.find({
-            username: new RegExp(query,'i')
+            username: new RegExp(query, 'i')
         });
 
-        res.render('search-results',{
+        res.render('search-results', {
             title: `Hasil untuk ${query}`,
             users,
             query
@@ -106,3 +106,36 @@ exports.searchUsers = async (req, res) => {
         res.status(500).send('Server Error');
     }
 };
+
+// FOLLOW UNFOLLOW
+exports.toggleFollow = async (req, res) => {
+
+    try {
+        const profileUserId = req.params.id;
+        const currentUserId = req.session.userId;
+
+        if (profileUserId === currentUserId) {
+            req.flash('error', 'Anda tidak bisa mengikuti diri sendiri');
+            return res.redirect('back');
+        }
+
+        const currentUser = await User.findById(currentUserId);
+        const profileUser = await User.findById(profileUserId);
+
+        if (currentUser.following.includes(profileUserId)) {
+            await User.findByIdAndUpdate(currentUserId, { $pull: { following: profileUserId } });
+            await User.findByIdAndUpdate(profileUserId,{$pull: {followers:currentUserId }});
+            req.flash(`success','Anda berhenti mengikuti ${profileUser.username}`);
+        }else{
+            await User.findByIdAndUpdate(currentUserId,{$addToSet:{following: profileUserId}});
+            await User.findByIdAndUpdate(currentUserId,{$addToSet:{followers: currentUserId}});
+            req.flash('success',`Anda sekarang mengikuti ${profileUser.username}`);
+        }
+        res.redirect(`/profile/${profileUser.username}`);
+
+    } catch (err) {
+        console.error(err);
+        req.flash('error','Terjadi kesalahan.');
+        res.redirect('back');
+    }
+}
