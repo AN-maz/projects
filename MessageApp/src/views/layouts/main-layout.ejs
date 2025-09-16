@@ -10,23 +10,36 @@
 </head>
 
 <body class="bg-light">
+
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="/dashboard">MessageApp</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <% if (user) { %>
+                        <!-- Link Home -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard">Home</a>
+                        </li>
+
+                        <!-- Link Pesan -->
                         <li class="nav-item">
                             <a class="nav-link" href="/messages">Pesan</a>
                         </li>
+
+                        <!-- Dropdown Avatar -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                                data-bs-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown"
+                                role="button" data-bs-toggle="dropdown">
                                 <img src="/uploads/avatars/<%= user.profilePicture %>" alt="Avatar" width="30"
-                                    height="30" class="rounded-circle">
+                                    height="30" class="rounded-circle me-1">
+                                <span>
+                                    <%= user.username || "Profil" %>
+                                </span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="/profile/settings">Pengaturan Profil</a></li>
@@ -36,7 +49,9 @@
                                 <li><a class="dropdown-item" href="/logout">Logout</a></li>
                             </ul>
                         </li>
+
                         <% } else { %>
+                            <!-- Kalau belum login -->
                             <li class="nav-item">
                                 <a class="nav-link" href="/login">Login</a>
                             </li>
@@ -48,6 +63,7 @@
             </div>
         </div>
     </nav>
+
 
     <main class="container mt-4">
         <% if (messages.success && messages.success.length> 0) { %>

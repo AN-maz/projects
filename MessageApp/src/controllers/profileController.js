@@ -1,4 +1,7 @@
 const User = require('../models/userModel');
+const path = require('path'); 
+// const Post = require('../models/postModel');
+const fs = require('fs');
 
 exports.showProfileSettings = async (req, res) => {
     res.render('profile-settings', {
@@ -7,10 +10,6 @@ exports.showProfileSettings = async (req, res) => {
 };
 
 exports.updateAvatar = async (req, res) => {
-
-    // LOG PALING PENTING ADA DI SINI
-    console.log('--- FUNGSI UPDATE AVATAR DIMULAI ---');
-    console.log('File yang diterima multer:', req.file);
 
     try {
         if (!req.file) {
@@ -21,10 +20,22 @@ exports.updateAvatar = async (req, res) => {
         const userId = req.session.userId;
         const newAvatarPath = req.file.filename;
 
-        await User.findByIdAndUpdate(userId, { profilePicture: newAvatarPath });
+        const user = await User.findById(userId);
 
+        if (user && user.profilePicture) {
+
+            const oldAvatarPath = path.join(__dirname, '../../public/uploads/avatars', user.profilePicture);
+
+            if(fs.existsSync(oldAvatarPath)){
+                fs.unlinkSync(oldAvatarPath);
+                console.log('Avatar lama berhasil dihapus MasPur!',oldAvatarPath);
+            }
+        }
+
+        await User.findByIdAndUpdate(userId, { profilePicture: newAvatarPath });
         req.flash('success', 'Foto profile berhasil diperbarui!');
         res.redirect('/profile/settings');
+
     } catch (err) {
         console.log(err);
         console.error('ERROR DI DALAM CATCH UPDATE AVATAR:', err);
@@ -40,11 +51,11 @@ exports.updateBio = async (req, res) => {
 
         await User.findByIdAndUpdate(userId, { bio: bio });
 
-        req.flash('success','Bio berhasil diperbarui MasPur!');
+        req.flash('success', 'Bio berhasil diperbarui MasPur!');
         res.redirect('/profile/settings');
     } catch (err) {
         console.log(err);
-        req.flash('error','Terjadi error saat memperbaharui bio');
+        req.flash('error', 'Terjadi error saat memperbaharui bio');
         res.redirect('/profile/settings');
     }
 };
