@@ -1,0 +1,28 @@
+<div class="container">
+    <% if (query) { %>
+        <h3>Hasil pencarian untuk: "<%= query %>"</h3>
+    <% } else { %>
+        <h3>Cari Pengguna</h3>
+    <% } %>
+    <hr>
+
+    <% if (users.length > 0) { %>
+        <div class="list-group">
+            <% users.forEach(foundUser => { %>
+                <a href="/profile/<%= foundUser.username %>" class="list-group-item list-group-item-action">
+                    <div class="d-flex align-items-center">
+                        <img src="/uploads/avatars/<%= foundUser.profilePicture %>" alt="Avatar" width="50" height="50" class="rounded-circle me-3">
+                        <div>
+                            <h5 class="mb-1"><%= foundUser.username %></h5>
+                            <p class="mb-1 text-muted"><%= foundUser.bio %></p>
+                        </div>
+                    </div>
+                </a>
+            <% }) %>
+        </div>
+    <% } else { %>
+        <% if (query) { %>
+            <p class="text-center text-muted">Pengguna tidak ditemukan.</p>
+        <% } %>
+    <% } %>
+</div>

@@ -1,7 +1,28 @@
 const User = require('../models/userModel');
-const path = require('path'); 
-// const Post = require('../models/postModel');
+const path = require('path');
+const Post = require('../models/postModel');
 const fs = require('fs');
+
+exports.showPublicProfile = async (req, res) => {
+    try {
+        const profileUser = await User.findOne({ username: req.params.username });
+
+        if (!profileUser) {
+            return res.status(404).render('not-found', { title: 'User tidak ditemukan!' });
+        }
+
+        const posts = await Post.find({ user: profileUser._id }).sort({ createdAt: -1 });
+
+        res.render('profile', {
+            title: `profle ${profileUser.username}`,
+            profileUser,
+            posts
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('Server Error');
+    }
+};
 
 exports.showProfileSettings = async (req, res) => {
     res.render('profile-settings', {
@@ -26,9 +47,9 @@ exports.updateAvatar = async (req, res) => {
 
             const oldAvatarPath = path.join(__dirname, '../../public/uploads/avatars', user.profilePicture);
 
-            if(fs.existsSync(oldAvatarPath)){
+            if (fs.existsSync(oldAvatarPath)) {
                 fs.unlinkSync(oldAvatarPath);
-                console.log('Avatar lama berhasil dihapus MasPur!',oldAvatarPath);
+                console.log('Avatar lama berhasil dihapus MasPur!', oldAvatarPath);
             }
         }
 
@@ -57,5 +78,31 @@ exports.updateBio = async (req, res) => {
         console.log(err);
         req.flash('error', 'Terjadi error saat memperbaharui bio');
         res.redirect('/profile/settings');
+    }
+};
+
+// SEACRH 
+exports.searchUsers = async (req, res) => {
+    try {
+        const query = req.query.q;
+        if(!query){
+            return res.render('search-results',{
+                title: 'Cari Pengguna',
+                users:[],
+                query: ''
+            });
+        }
+        const users = await User.find({
+            username: new RegExp(query,'i')
+        });
+
+        res.render('search-results',{
+            title: `Hasil untuk ${query}`,
+            users,
+            query
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('Server Error');
     }
 };
