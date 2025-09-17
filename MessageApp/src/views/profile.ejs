@@ -4,31 +4,48 @@
             <div class="row align-items-center">
 
                 <div class="col-md-3 text-center">
-                    <img src="/uploads/avatars/<%= profileUser.profilePicture %>" 
-                         alt="Avatar" 
-                         width="150" 
-                         height="150" 
-                         class="rounded-circle img-thumbnail">
+                    <img src="/uploads/avatars/<%= profileUser.profilePicture %>" alt="Avatar" width="150" height="150"
+                        class="rounded-circle img-thumbnail">
                 </div>
 
                 <div class="col-md-9">
-                    <h2 class="mb-0"><%= profileUser.username %></h2>
-                    <p class="text-muted"><%= profileUser.bio %></p>
+                    <h2 class="mb-0">
+                        <%= profileUser.username %>
+                    </h2>
+                    <p class="text-muted">
+                        <%= profileUser.bio %>
+                    </p>
                     <div class="d-flex mb-3">
-                        <div class="me-4"><strong><%= posts.length %></strong> Postingan</div>
-                        <div class="me-4"><strong><%= profileUser.followers.length %></strong> Pengikut</div>
-                        <div><strong><%= profileUser.following.length %></strong> Mengikuti</div>
+                        <div class="me-4"><strong>
+                                <%= posts.length %>
+                            </strong> Postingan</div>
+                        <div class="me-4"><strong>
+                                <%= profileUser.followers.length %>
+                            </strong> Pengikut</div>
+                        <div><strong>
+                                <%= profileUser.following.length %>
+                            </strong> Mengikuti</div>
+
                     </div>
 
-                    <% if (user && user._id.toString() !== profileUser._id.toString()) { %>
-                        <form action="/profile/<%= profileUser._id %>/follow" method="POST">
-                            <% if (user.following.map(id => id.toString()).includes(profileUser._id.toString())) { %>
-                                <button type="submit" class="btn btn-secondary">Unfollow</button>
-                            <% } else { %>
-                                <button type="submit" class="btn btn-primary">Follow</button>
-                            <% } %>
-                        </form>
-                    <% } %>
+                    <% if (user && user._id.toString() !==profileUser._id.toString()) { %>
+                        <div class="d-flex gap-2">
+                            <!-- Tombol Follow / Unfollow -->
+                            <form action="/profile/<%= profileUser._id %>/follow" method="POST">
+                                <% if (user.following.map(id=> id.toString()).includes(profileUser._id.toString())) { %>
+                                    <button type="submit" class="btn btn-secondary">Unfollow</button>
+                                    <% } else { %>
+                                        <button type="submit" class="btn btn-primary">Follow</button>
+                                        <% } %>
+                            </form>
+
+                            <!-- Tombol Kirim Pesan -->
+                            <form action="/messages/new/<%= profileUser._id %>" method="POST">
+                                <button type="submit" class="btn btn-outline-primary">Kirim Pesan</button>
+                            </form>
+                        </div>
+                        <% } %>
+
                 </div>
             </div>
         </div>
@@ -36,41 +53,48 @@
 
     <h4 class="mb-3">Postingan</h4>
     <div class="row row-cols-1 row-cols-md-3 g-4">
-        <% if (posts.length > 0) { %>
-            <% posts.forEach(post => { %>
+        <% if (posts.length> 0) { %>
+            <% posts.forEach(post=> { %>
                 <div class="col">
                     <div class="card h-100">
                         <div class="card-body d-flex flex-column">
-                            <p class="card-text mb-auto"><%= post.content %></p>
-                            
+                            <p class="card-text mb-auto">
+                                <%= post.content %>
+                            </p>
+
                             <div class="mt-3">
                                 <hr>
                                 <div class="d-flex align-items-center">
-                                    <form class="like-form me-2" action="/posts/<%= post._id %>/like" method="POST" data-postid="<%= post._id %>">
-                                        <% if (user && post.likes.map(id => id.toString()).includes(user._id.toString())) { %>
+                                    <form class="like-form me-2" action="/posts/<%= post._id %>/like" method="POST"
+                                        data-postid="<%= post._id %>">
+                                        <% if (user && post.likes.map(id=> id.toString()).includes(user._id.toString()))
+                                            { %>
                                             <button type="submit" class="btn btn-sm btn-danger">Batal Suka</button>
-                                        <% } else { %>
-                                            <button type="submit" class="btn btn-sm btn-outline-primary">Suka</button>
-                                        <% } %>
+                                            <% } else { %>
+                                                <button type="submit"
+                                                    class="btn btn-sm btn-outline-primary">Suka</button>
+                                                <% } %>
                                     </form>
 
                                     <a href="#" class="btn btn-sm btn-outline-secondary me-3">Komentar</a>
-                                    
+
                                     <small class="text-muted" id="likes-count-<%= post._id %>">
                                         <%= post.likes.length %> Suka
                                     </small>
                                 </div>
                             </div>
-                            </div>
+                        </div>
 
                         <div class="card-footer">
-                            <small class="text-muted"><%= post.createdAt.toLocaleString('id-ID') %></small>
+                            <small class="text-muted">
+                                <%= post.createdAt.toLocaleString('id-ID') %>
+                            </small>
                         </div>
                     </div>
                 </div>
-            <% }) %>
-        <% } else { %>
-            <p class="text-center text-muted">Pengguna ini belum memiliki postingan.</p>
-        <% } %>
+                <% }) %>
+                    <% } else { %>
+                        <p class="text-center text-muted">Pengguna ini belum memiliki postingan.</p>
+                        <% } %>
     </div>
 </div>

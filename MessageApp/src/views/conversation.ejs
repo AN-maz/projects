@@ -1,0 +1,45 @@
+<div class="d-flex flex-column h-100">
+    <div class="p-3 border-bottom d-flex align-items-center">
+        <a href="/profile/<%= otherUser.username %>" class="text-decoration-none text-dark d-flex align-items-center">
+            <img src="/uploads/avatars/<%= otherUser.profilePicture %>" alt="Avatar" width="40" height="40" class="rounded-circle me-3">
+            <h5 class="mb-0"><%= otherUser.username %></h5>
+        </a>
+    </div>
+
+    <div class="flex-grow-1 p-3" style="overflow-y: auto; height: 60vh;">
+        <% if(messages.length > 0) { %>
+            <% messages.forEach(message => { %>
+                <% if(message.sender._id.toString() === user._id.toString()) { %>
+                    <div class="d-flex justify-content-end mb-3">
+                        <div class="bg-primary text-white p-2 rounded" style="max-width: 70%;">
+                            <%= message.content %>
+                            <div class="text-end text-light opacity-75" style="font-size: 0.75rem;">
+                                <%= new Date(message.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit'}) %>
+                            </div>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <div class="d-flex justify-content-start mb-3">
+                        <div class="bg-light p-2 rounded" style="max-width: 70%;">
+                            <%= message.content %>
+                            <div class="text-end text-muted" style="font-size: 0.75rem;">
+                                <%= new Date(message.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit'}) %>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            <% }) %>
+        <% } else { %>
+            <p class="text-center text-muted">Belum ada pesan. Mulai percakapan!</p>
+        <% } %>
+    </div>
+
+    <div class="p-3 border-top bg-white">
+        <form action="/messages/<%= otherUser.username %>" method="POST">
+            <div class="input-group">
+                <input type="text" name="content" class="form-control" placeholder="Ketik pesan..." required autocomplete="off">
+                <button class="btn btn-primary" type="submit">Kirim</button>
+            </div>
+        </form>
+    </div>
+</div>

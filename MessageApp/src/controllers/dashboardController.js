@@ -9,25 +9,26 @@ exports.showDashboard = async (req, res) => {
             return res.redirect('/login');
         }
 
+        const currentUser = res.locals.user;
+
         const posts = await Post.find().populate('user').sort({ createdAt: -1 });
 
-        const conversation = await Conversation.find({ participants: res.locals.user._id })
+        const conversations = await Conversation.find({ participants: currentUser._id })
             .populate({
                 path: 'participants',
-                select: 'username profilePictures'
+                select: 'username profilePicture'
             })
             .sort({ updatedAt: -1 });
 
         res.render('dashboard', {
-            title: 'Dasboard',
+            title: 'Dashboard',
             posts,
-            conversation
-            // layout: 'layouts/main-layout',
-            // user: req.user || null // baris baru
+            conversations
         });
 
     } catch (err) {
-        console.error(err);
-        res.status(500).send('Server Error');
+        console.error("Error in showDashboard:", err);
+        req.flash('error', 'Terjadi kesalahan saat memuat dashboard.');
+        res.redirect('/login');
     }
 }

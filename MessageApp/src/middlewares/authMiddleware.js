@@ -42,4 +42,11 @@ const attachUser = async (req, res, next) => {
     next();
 };
 
-module.exports = { isAuth, isGuest, attachUser };
+const isAuthenticated = (req,res,next) =>{
+    if(res.locals.user){
+        return next();
+    }
+    req.flash('error','Anda harus login untuk mengakses halaman ini');
+    res.redirect('/login');
+}
+module.exports = { isAuth, isGuest, attachUser, isAuthenticated };
