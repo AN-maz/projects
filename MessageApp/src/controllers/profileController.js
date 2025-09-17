@@ -3,6 +3,8 @@ const path = require('path');
 const Post = require('../models/postModel');
 const fs = require('fs');
 
+const Conversation = require('../models/conversationModel');
+
 exports.showPublicProfile = async (req, res) => {
     try {
         const profileUser = await User.findOne({ username: req.params.username });
@@ -11,12 +13,20 @@ exports.showPublicProfile = async (req, res) => {
             return res.status(404).render('not-found', { title: 'User tidak ditemukan!' });
         }
 
+        const currentUser = res.locals.user;
         const posts = await Post.find({ user: profileUser._id }).sort({ createdAt: -1 });
 
+        const conversations = await Conversation.find({ participants: currentUser._id })
+            .populate({
+                path: 'participants',
+                select: 'username profilePicture'
+            })
+            .sort({ updatedAt: -1 });
         res.render('profile', {
-            title: `profle ${profileUser.username}`,
+            title: `Profil ${profileUser.username}`,
             profileUser,
-            posts
+            posts,
+            conversations
         });
     } catch (err) {
         console.log(err);
@@ -25,8 +35,19 @@ exports.showPublicProfile = async (req, res) => {
 };
 
 exports.showProfileSettings = async (req, res) => {
+
+    const currentUser = res.locals.user;
+
+    const conversations = await Conversation.find({ participants: currentUser._id })
+        .populate({
+            path: 'participants',
+            select: 'username profilePicture'
+        })
+        .sort({ updatedAt: -1 });
+
     res.render('profile-settings', {
-        title: 'Pengaturan Profile'
+        title: 'Pengaturan Profile',
+        conversations
     });
 };
 
@@ -109,7 +130,6 @@ exports.searchUsers = async (req, res) => {
 
 // FOLLOW UNFOLLOW
 exports.toggleFollow = async (req, res) => {
-
     try {
         const profileUserId = req.params.id;
         const currentUserId = req.session.userId;
@@ -122,20 +142,28 @@ exports.toggleFollow = async (req, res) => {
         const currentUser = await User.findById(currentUserId);
         const profileUser = await User.findById(profileUserId);
 
+        if (!profileUser) {
+            req.flash('error', 'Pengguna tidak ditemukan.');
+            return res.redirect('back');
+        }
+
         if (currentUser.following.includes(profileUserId)) {
+            // Logika UNFOLLOW (sudah benar)
             await User.findByIdAndUpdate(currentUserId, { $pull: { following: profileUserId } });
-            await User.findByIdAndUpdate(profileUserId,{$pull: {followers:currentUserId }});
-            req.flash(`success','Anda berhenti mengikuti ${profileUser.username}`);
-        }else{
-            await User.findByIdAndUpdate(currentUserId,{$addToSet:{following: profileUserId}});
-            await User.findByIdAndUpdate(currentUserId,{$addToSet:{followers: currentUserId}});
-            req.flash('success',`Anda sekarang mengikuti ${profileUser.username}`);
+            await User.findByIdAndUpdate(profileUserId, { $pull: { followers: currentUserId } });
+            req.flash('success', `Anda berhenti mengikuti ${profileUser.username}`);
+        } else {
+            // Logika FOLLOW (ini yang diperbaiki)
+            await User.findByIdAndUpdate(currentUserId, { $addToSet: { following: profileUserId } });
+            // SEHARUSNYA MENGUPDATE 'profileUser', BUKAN 'currentUser' LAGI
+            await User.findByIdAndUpdate(profileUserId, { $addToSet: { followers: currentUserId } });
+            req.flash('success', `Anda sekarang mengikuti ${profileUser.username}`);
         }
         res.redirect(`/profile/${profileUser.username}`);
 
     } catch (err) {
         console.error(err);
-        req.flash('error','Terjadi kesalahan.');
+        req.flash('error', 'Terjadi kesalahan.');
         res.redirect('back');
     }
-}
+};
