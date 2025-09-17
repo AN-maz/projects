@@ -9,6 +9,7 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const postRoutes = require('./routes/postRoutes')
 const profileRoutes = require('./routes/profileRoutes');    
 const User = require('./models/userModel');
+const { attachUser } = require('./middlewares/authMiddleware'); // baru
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use((req, res, next) => {
     console.log(`Request Masuk: ${req.method} ${req.originalUrl}`);
     next();
 });
+
 
 // 1. Middleware umum (wajib sebelum session dan rute)
 app.use(express.urlencoded({ extended: true }));
@@ -44,19 +46,22 @@ app.use((req,res,next) =>{
     next();
 });
 
-app.use(async (req, res, next) => {
-    if (req.session.userId) {
-        const user = await User.findById(req.session.userId);
-        res.locals.user = user;
-    } else {
-        res.locals.user = null;
-    }
-    next();
-});
+// app.use(async (req, res, next, err) => {
+//     if (req.session.userId) {
+//         const user = await User.findById(req.session.userId);
+//         res.locals.user = user || null;
+//         next();
+//     } else {
+//         console.error("Error fetch user:", err);
+//         res.locals.user = null;
+//     }
+//     next();
+// });
+
+app.use(attachUser);
 
 // 4. GUNAKAN RUTE-RUTE
 app.get('/', (req, res) => {
-
     if (req.session.userId) {
         res.redirect('/dashboard');
     } else {

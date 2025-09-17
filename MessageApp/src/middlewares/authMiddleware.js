@@ -1,3 +1,5 @@
+const User = require('../models/userModel');
+
 // MIDDLEWARE UNTUK ROUTE SETELAH LOGIN 
 const isAuth = (req, res, next) => {
 
@@ -24,4 +26,20 @@ const isGuest = (req, res, next) => {
     }
 };
 
-module.exports = { isAuth, isGuest };
+// Middleware inject user ke res.locals
+const attachUser = async (req, res, next) => {
+    if (req.session.userId) {
+        try {
+            const user = await User.findById(req.session.userId);
+            res.locals.user = user; // ini bisa langsung dipakai di semua EJS
+        } catch (err) {
+            console.error('Gagal ambil user:', err);
+            res.locals.user = null;
+        }
+    } else {
+        res.locals.user = null;
+    }
+    next();
+};
+
+module.exports = { isAuth, isGuest, attachUser };

@@ -7,7 +7,10 @@ exports.showDashboard = async (req, res) => {
 
         res.render('dashboard', {
             title: 'Dasboard',
-            posts
+            posts,
+            // layout: 'layouts/main-layout',
+            // user: req.user || null // baris baru
+        
         });
 
     } catch (err) {
