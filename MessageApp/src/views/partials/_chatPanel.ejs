@@ -1,0 +1,33 @@
+<h5>Pesan</h5>
+<hr>
+
+<div class="list-group">
+    <% if (typeof conversations !== 'undefined' && conversations.length > 0) { %>
+        <% conversations.forEach(conv => { %>
+            <%# Cari siapa lawan bicara kita dalam percakapan ini %>
+            <% const otherParticipant = conv.participants.find(p => p._id.toString() !== user._id.toString()) %>
+            
+            <% if (otherParticipant) { %>
+                <a href="/messages/<%= otherParticipant.username %>" class="list-group-item list-group-item-action d-flex align-items-center">
+                    <img src="/uploads/avatars/<%= otherParticipant.profilePicture %>" alt="Avatar" width="40" height="40" class="rounded-circle me-3">
+                    <div class="flex-grow-1">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1"><%= otherParticipant.username %></h6>
+                            <small class="text-muted"><%= new Date(conv.updatedAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short'}) %></small>
+                        </div>
+                        <p class="mb-1 small text-muted text-truncate">
+                            <%# Tampilkan preview pesan terakhir jika ada %>
+                            <% if (conv.lastMessage && conv.lastMessage.text) { %>
+                                <%= conv.lastMessage.text %>
+                            <% } else { %>
+                                Mulai percakapan...
+                            <% } %>
+                        </p>
+                    </div>
+                </a>
+            <% } %>
+        <% }) %>
+    <% } else { %>
+        <p class="text-center text-muted">Belum ada percakapan.</p>
+    <% } %>
+</div>
