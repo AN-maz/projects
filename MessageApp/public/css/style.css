@@ -1,0 +1,16 @@
+.post-image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa; /* Warna latar belakang agar konsisten */
+  overflow: hidden;
+  max-height: 500px; /* Batasi tinggi maksimum gambar */
+}
+
+.post-image-container .card-img-top {
+  width: auto; /* Biarkan lebar menyesuaikan */
+  height: auto;
+  max-width: 100%;
+  max-height: 500px; /* Sesuaikan dengan container */
+  object-fit: contain; /* Ini kuncinya: gambar tidak akan terdistorsi */
+}
