@@ -138,4 +138,60 @@ document.addEventListener('DOMContentLoaded', () => {
             listGroup.insertBefore(convElement, listGroup.firstChild);
         });
     }
+
+    // TAMBAHKAN BLOK BARU INI UNTUK MENGIRIM KOMENTAR
+    document.body.addEventListener('submit', async (e) => {
+        if (e.target.matches('.comment-form')) {
+            e.preventDefault();
+            const form = e.target;
+            const postId = form.dataset.postid;
+            const parentId = form.dataset.parentid; // Akan 'undefined' jika ini komentar utama
+            const input = form.querySelector('input[name="content"]');
+            const content = input.value.trim();
+
+            if (!content) return;
+
+            try {
+                const response = await fetch(`/posts/${postId}/comments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        content: content,
+                        parentCommentId: parentId
+                    })
+                });
+                
+                const data = await response.json();
+
+                if (data.success) {
+                    const newComment = data.comment;
+                    // Buat HTML untuk komentar baru
+                    const commentHTML = `
+                        <div class="d-flex mb-2">
+                            <img src="/uploads/avatars/${newComment.user.profilePicture}" alt="Avatar" width="30" height="30" class="rounded-circle me-2 mt-1">
+                            <div class="bg-white p-2 rounded w-100">
+                                <a href="/profile/${newComment.user.username}" class="fw-bold text-dark text-decoration-none small">${newComment.user.username}</a>
+                                <p class="mb-0 small">${newComment.content}</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Tentukan di mana komentar baru akan ditampilkan
+                    if (parentId) {
+                        // Jika ini balasan, tambahkan di bawah komentar induk
+                        const parentCommentElement = document.getElementById(`comment-${parentId}`);
+                        parentCommentElement.querySelector('.replies-container').insertAdjacentHTML('beforeend', commentHTML);
+                    } else {
+                        // Jika komentar utama, tambahkan di atas form
+                        const commentSection = form.closest('.card-footer');
+                        commentSection.insertAdjacentHTML('afterbegin', commentHTML);
+                    }
+
+                    input.value = ''; // Kosongkan input
+                }
+            } catch (err) {
+                console.error('Gagal mengirim komentar:', err);
+            }
+        }
+    });
 });

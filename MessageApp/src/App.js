@@ -22,6 +22,8 @@ app.use((req, res, next) => {
 
 
 // 1. Middleware umum (wajib sebelum session dan rute)
+app.use(express.urlencoded({ extended: true })); 
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 
