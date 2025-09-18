@@ -9,8 +9,9 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const postRoutes = require('./routes/postRoutes')
 const profileRoutes = require('./routes/profileRoutes');    
 const User = require('./models/userModel');
-const { attachUser } = require('./middlewares/authMiddleware'); // baru
+const { attachUser } = require('./middlewares/authMiddleware'); 
 const messageRoutes = require('./routes/messageRoutes');
+const commentRoutes = require('./routes/commentRoutes');
 
 const app = express();
 
@@ -76,5 +77,6 @@ app.use(dashboardRoutes);
 app.use(postRoutes);
 app.use(profileRoutes);
 app.use(messageRoutes);
+app.use(commentRoutes);
 
 module.exports = app;

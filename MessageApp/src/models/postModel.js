@@ -1,23 +1,40 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const PostSchema = new mongoose.Schema({
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
+// 1. Kita definisikan skema dengan nama 'postSchema'
+const postSchema = new Schema({
     content: {
         type: String,
-        trim: true,
         required: true
     },
     image: {
         type: String
     },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
     likes: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User'
     }]
 }, { timestamps: true });
 
-module.exports = mongoose.model('Post', PostSchema);
+
+// 2. Kita gunakan nama 'postSchema' untuk menambahkan virtual field
+postSchema.virtual('comments', {
+    ref: 'Comment',
+    localField: '_id',
+    foreignField: 'post'
+});
+
+// 3. Pastikan virtuals di-include
+postSchema.set('toJSON', { virtuals: true });
+postSchema.set('toObject', { virtuals: true });
+
+
+// 4. Kita gunakan lagi 'postSchema' untuk membuat model
+const Post = mongoose.model('Post', postSchema);
+
+module.exports = Post;

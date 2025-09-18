@@ -4,14 +4,26 @@ const Conversation = require('../models/conversationModel');
 exports.showDashboard = async (req, res) => {
 
     try {
-
+        
         if (!res.locals.user) {
             return res.redirect('/login');
         }
 
         const currentUser = res.locals.user;
 
-        const posts = await Post.find().populate('user').sort({ createdAt: -1 });
+        // const posts = await Post.find().populate('user').sort({ createdAt: -1 });
+
+        const posts = await Post.find()
+        .populate('user')
+        .populate({
+            path: 'comments',
+            options: {sort: {createdAt: 'asc'}},
+            populate:{
+                path:'user',
+                select: 'username profilePicture'
+            }
+        })
+        .sort({createdAt: -1});
 
         const conversations = await Conversation.find({ participants: currentUser._id })
             .populate({
