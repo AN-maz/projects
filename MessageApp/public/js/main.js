@@ -1,8 +1,6 @@
-// public/js/main.js (FINAL & COMPLETE)
-
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // ... (kode 'likeForms' tidak perlu diubah) ...
+
+    // ================= LIKE/UNLIKE POSTINGAN =================
     const likeForms = document.querySelectorAll('.like-form');
     likeForms.forEach(form => {
         form.addEventListener('submit', async (e) => {
@@ -33,6 +31,40 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // ================= LIKE/UNLIKE KOMENTAR =================
+    document.body.addEventListener('submit', async (e) => {
+        if (e.target.matches('.comment-like-form')) {
+            e.preventDefault();
+            const form = e.target;
+            const commentId = form.dataset.commentid;
+
+            try {
+                const response = await fetch(`/comments/${commentId}/like`, { method: 'POST' });
+                const data = await response.json();
+
+                if (data.success) {
+                    const button = form.querySelector('button strong');
+                    const likesCount = document.getElementById(`comment-likes-count-${commentId}`);
+
+                    if (data.liked) {
+                        button.textContent = 'Batal Suka';
+                        button.classList.remove('text-primary');
+                        button.classList.add('text-danger');
+                    } else {
+                        button.textContent = 'Suka';
+                        button.classList.remove('text-danger');
+                        button.classList.add('text-primary');
+                    }
+                    if (likesCount) {
+                        likesCount.textContent = `${data.likesCount} Suka`;
+                    }
+                }
+            } catch (err) {
+                console.error('Gagal like komentar:', err);
+            }
+        }
+    });
+
     // ================= LOGIKA UNTUK NOTIFIKASI REAL-TIME =================
     if (typeof currentUserId !== 'undefined') {
         const socket = io();
@@ -41,11 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
             socket.emit('register', currentUserId);
         });
 
-        // ... (kode notifikasi Toast tidak perlu diubah) ...
+        // Toast Bootstrap untuk notifikasi
         const toastElement = document.getElementById('notificationToast');
         const toastTitle = document.getElementById('notificationTitle');
         const toastBody = document.getElementById('notificationBody');
         const notificationToast = toastElement ? new bootstrap.Toast(toastElement) : null;
+
         socket.on('newNotification', (data) => {
             if (notificationToast) {
                 toastTitle.innerText = data.title;
@@ -54,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // INI BAGIAN YANG DIPERBAIKI SECARA TOTAL
+        // ================= UPDATE LIST CONVERSATION REAL-TIME =================
         socket.on('conversationUpdated', (updatedConv) => {
             const listGroup = document.querySelector('.list-group');
             if (!listGroup) return;

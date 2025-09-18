@@ -31,3 +31,37 @@ exports.createComment = async (req, res) => {
         res.redirect(backURL); // <-- Gunakan backURL juga di sini
     }
 };
+
+
+exports.toggleLikeComment = async (req, res) => {
+    try {
+        const { commentId } = req.params;
+        const userId = req.session.userId;
+
+        const comment = await Comment.findById(commentId);
+
+        if (!comment) {
+            return res.status(404).json({ success: false, message: 'Komentar tidak ditemukan' });
+        }
+
+        const isLiked = comment.likes.includes(userId);
+
+        if (isLiked) {
+            await Comment.findByIdAndUpdate(commentId, { $pull: { likes: userId } });
+        } else {
+            await Comment.findByIdAndUpdate(commentId, { $addToSet: { likes: userId } });
+        }
+        
+        const updatedComment = await Comment.findById(commentId);
+        
+        res.json({
+            success: true,
+            liked: !isLiked, 
+            likesCount: updatedComment.likes.length 
+        });
+
+    } catch (error) {
+        console.error('Gagal like komentar:', error);
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};

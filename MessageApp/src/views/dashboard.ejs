@@ -66,7 +66,24 @@
                                 <img src="/uploads/avatars/<%= comment.user.profilePicture %>" alt="Avatar" width="30" height="30" class="rounded-circle me-2 mt-1">
                                 <div class="bg-white p-2 rounded w-100">
                                     <a href="/profile/<%= comment.user.username %>" class="fw-bold text-dark text-decoration-none small"><%= comment.user.username %></a>
-                                    <p class="mb-0 small"><%= comment.content %></p>
+                                    <p class="mb-1 small"><%= comment.content %></p>
+
+                                    <!-- ✅ fitur like/unlike komentar -->
+                                    <div class="d-flex align-items-center mt-1">
+                                        <form class="comment-like-form" method="POST" data-commentid="<%= comment._id %>">
+                                            <button type="submit" class="btn btn-link btn-sm text-decoration-none p-0">
+                                                <% if (user && comment.likes.includes(user._id.toString())) { %>
+                                                    <strong class="text-danger">Batal Suka</strong>
+                                                <% } else { %>
+                                                    <strong class="text-primary">Suka</strong>
+                                                <% } %>
+                                            </button>
+                                        </form>
+                                        <small class="text-muted mx-2">·</small>
+                                        <small class="text-muted" id="comment-likes-count-<%= comment._id %>">
+                                            <%= comment.likes.length %> Suka
+                                        </small>
+                                    </div>
                                 </div>
                             <% } %>
                         </div>
