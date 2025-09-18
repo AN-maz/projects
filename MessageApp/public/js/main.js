@@ -39,3 +39,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+
+// --- LIVE NOTIF ---
+if (typeof currentUserId !== 'undefined') {
+    const socket = io();
+
+    socket.on('connect', () => {
+        socket.emit('register', currentUserId);
+    });
+
+    const toastElement = document.getElementById('notificationToast');
+    const toastTitle = document.getElementById('notificationTitle');
+    const toastBody = document.getElementById('notificationBody');
+    // Perbaikan: 'bootstrap' (b kecil) adalah objek global dari script Bootstrap
+    const notificationToast = toastElement ? new bootstrap.Toast(toastElement) : null;
+
+    socket.on('newNotification', (data) => {
+        if (notificationToast) {
+            toastTitle.innerText = data.title;
+            if (data.link) {
+                toastBody.innerHTML = `<a href="${data.link}" class="text-dark text-decoration-none">${data.message}</a>`;
+            } else {
+                toastBody.innerText = data.message;
+            }
+            notificationToast.show();
+        }
+    });
+}

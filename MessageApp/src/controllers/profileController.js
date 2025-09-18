@@ -105,6 +105,15 @@ exports.updateBio = async (req, res) => {
 // SEACRH 
 exports.searchUsers = async (req, res) => {
     try {
+
+        const currentUser = res.locals.user;
+        const conversations = await Conversation.find({ participants: currentUser._id })
+            .populate({
+                path: 'participants',
+                select: 'username profilePicture'
+            })
+            .sort({ updatedAt: -1 });
+
         const query = req.query.q;
         if (!query) {
             return res.render('search-results', {
@@ -120,7 +129,8 @@ exports.searchUsers = async (req, res) => {
         res.render('search-results', {
             title: `Hasil untuk ${query}`,
             users,
-            query
+            query,
+            conversations
         });
     } catch (err) {
         console.log(err);
