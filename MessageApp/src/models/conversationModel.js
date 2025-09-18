@@ -9,9 +9,14 @@ const conversationSchema = new Schema({
     lastMessage: {
         text: String,
         sender: { type: Schema.Types.ObjectId, ref: 'User' }
-    }
+    },
+
+    // --- NOTIVE MESSAGE ---
+    unreadBy : [{
+        type:Schema.Types.ObjectId,
+        ref : 'User'
+    }]
 }, { timestamps: true });
 
 const conversation = mongoose.model('Conversation', conversationSchema);
-
 module.exports = conversation;

@@ -1,16 +1,29 @@
+/* public/css/style.css */
+
+/* ATURAN UNTUK KARTU POSTINGAN AGAR KONSISTEN */
+.post-card {
+  border: 1px solid #e9ecef;
+}
+
 .post-image-container {
+  width: 100%; /* Memastikan container mengisi lebar kartu */
+  aspect-ratio: 16 / 9;
+  background-color: #f0f0f0;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f8f9fa; /* Warna latar belakang agar konsisten */
   overflow: hidden;
-  max-height: 500px; /* Batasi tinggi maksimum gambar */
 }
 
-.post-image-container .card-img-top {
-  width: auto; /* Biarkan lebar menyesuaikan */
-  height: auto;
-  max-width: 100%;
-  max-height: 500px; /* Sesuaikan dengan container */
-  object-fit: contain; /* Ini kuncinya: gambar tidak akan terdistorsi */
+.post-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 'cover' akan mengisi frame, 'contain' akan menampilkan seluruh gambar */
+}
+
+.chat-preview {
+  white-space: nowrap; /* Mencegah teks turun ke baris baru */
+  overflow: hidden; /* Sembunyikan teks yang berlebih */
+  text-overflow: ellipsis; /* Tampilkan "..." di akhir teks yang terpotong */
+  max-width: 150px; /* Atur lebar maksimum pratinjau, sesuaikan jika perlu */
 }

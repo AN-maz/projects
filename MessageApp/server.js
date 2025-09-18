@@ -4,7 +4,7 @@ const connectDB = require('./src/config/db');
 const http = require('http');
 const { Server } = require("socket.io");
 const Message = require('./src/models/messageModel');
-const Conversation = require('./src/models/conversationModel');
+const Conversation = require('./src/models/conversationModel'); // ✅ hapus duplikasi
 
 const server = http.createServer(app);
 const io = new Server(server);
@@ -23,8 +23,13 @@ io.on('connection', (socket) => {
         console.log(`Socket ${socket.id} bergabung ke ruang ${conversationId}`);
     });
 
+    // server.js -> io.on('connection', ...)
+
+    // server.js -> di dalam io.on('connection', ...)
+
     socket.on('sendMessage', async (messageData) => {
         try {
+            // 1. Simpan pesan baru ke database
             const newMessage = new Message({
                 conversationId: messageData.conversationId,
                 sender: messageData.sender,
@@ -32,38 +37,74 @@ io.on('connection', (socket) => {
             });
             const savedMessage = await newMessage.save();
 
+            // 2. Ambil data percakapan yang ada
             const conversation = await Conversation.findById(messageData.conversationId);
-            await conversation.updateOne({
-                updatedAt: new Date(),
-                lastMessage: { text: savedMessage.content, sender: savedMessage.sender }
-            });
+            if (!conversation) return; // Hentikan jika percakapan tidak ditemukan
 
+            // 3. Tentukan siapa penerimanya
+            const receiverId = conversation.participants.find(id => id.toString() !== messageData.sender);
+
+            // 4. Update percakapan dengan info baru
+            await Conversation.findByIdAndUpdate(
+                messageData.conversationId,
+                {
+                    updatedAt: new Date(),
+                    lastMessage: { text: savedMessage.content, sender: savedMessage.sender },
+                    $addToSet: { unreadBy: receiverId }
+                }
+            );
+
+            // 5. Ambil data terbaru dari kedua dokumen untuk disiarkan
             const populatedMessage = await Message.findById(savedMessage._id)
                 .populate('sender', 'username profilePicture');
 
-            // Kirim pesan ke ruang obrolan
+            const updatedConversation = await Conversation.findById(messageData.conversationId)
+                .populate('participants', 'username profilePicture');
+
+            // 6. Kirim pesan baru ke jendela obrolan
             io.to(messageData.conversationId).emit('newMessage', populatedMessage);
 
-            // Kirim notifikasi
-            const receiverId = conversation.participants.find(id => id.toString() !== messageData.sender);
+            // 7. Kirim pembaruan panel pesan ke semua peserta
+            updatedConversation.participants.forEach(participant => {
+                const participantSocketId = onlineUsers.get(participant._id.toString());
+                if (participantSocketId) {
+                    io.to(participantSocketId).emit('conversationUpdated', updatedConversation);
+                }
+            });
+
+            // 8. Kirim notifikasi pop-up ke penerima
             if (receiverId) {
                 const receiverSocketId = onlineUsers.get(receiverId.toString());
                 if (receiverSocketId) {
                     io.to(receiverSocketId).emit('newNotification', {
                         title: `Pesan baru dari ${populatedMessage.sender.username}`,
                         message: populatedMessage.content,
-                        link: `/messages/${populatedMessage.sender.username}` // <-- Link diperbaiki
+                        link: `/messages/${populatedMessage.sender.username}`
                     });
+
+                    // io.to(receiverSocketId).emit('test_event', 'Halo, ini sinyal tes!');
                 }
             }
+
         } catch (err) {
             console.error('Error saat menyimpan atau menyiarkan pesan:', err);
         }
     });
 
-    socket.on('disconnect', () => { // <-- Nama event diperbaiki
+    // ✅ perbaikan nama event: markAsRead
+    socket.on('markAsRead', async ({ conversationId, userId }) => {
+        try {
+            await Conversation.findByIdAndUpdate(conversationId, {
+                $pull: { unreadBy: userId }
+            });
+        } catch (err) {
+            console.error('Gagal menandai sudah dibaca:', err);
+        }
+    });
+
+    socket.on('disconnect', () => {
         for (let [userId, socketId] of onlineUsers.entries()) {
-            if (socketId === socket.id) { // <-- Variabel diperbaiki
+            if (socketId === socket.id) {
                 onlineUsers.delete(userId);
                 break;
             }
