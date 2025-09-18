@@ -75,41 +75,41 @@ exports.showConversation = async (req, res) => {
     }
 }
 
-exports.sendMessage = async (req, res) => {
-    try {
-        const { content } = req.body;
-        const sender = res.locals.user;
-        const receiverUsername = req.params.username;
+// exports.sendMessage = async (req, res) => {
+//     try {
+//         const { content } = req.body;
+//         const sender = res.locals.user;
+//         const receiverUsername = req.params.username;
 
-        const receiver = await User.findOne({ username: receiverUsername });
-        if (!receiver) return res.redirect('/dashboard'); // <-- 4. DIPERBAIKI
+//         const receiver = await User.findOne({ username: receiverUsername });
+//         if (!receiver) return res.redirect('/dashboard'); // <-- 4. DIPERBAIKI
 
-        let conversation = await Conversation.findOne({
-            participants: { $all: [sender._id, receiver._id] }
-        });
+//         let conversation = await Conversation.findOne({
+//             participants: { $all: [sender._id, receiver._id] }
+//         });
 
-        if (!conversation) {
-            // Ini seharusnya tidak terjadi, tapi untuk jaga-jaga
-            conversation = new Conversation({ participants: [sender._id, receiver._id] });
-            await conversation.save(); 
-        }
+//         if (!conversation) {
+//             // Ini seharusnya tidak terjadi, tapi untuk jaga-jaga
+//             conversation = new Conversation({ participants: [sender._id, receiver._id] });
+//             await conversation.save(); 
+//         }
 
-        const newMessage = new Message({
-            conversationId: conversation._id,
-            sender: sender._id,
-            content
-        });
+//         const newMessage = new Message({
+//             conversationId: conversation._id,
+//             sender: sender._id,
+//             content
+//         });
         
-        await Promise.all([
-            newMessage.save(),
-            conversation.updateOne({ updatedAt: new Date() })
-        ]);
+//         await Promise.all([
+//             newMessage.save(),
+//             conversation.updateOne({ updatedAt: new Date() })
+//         ]);
 
-        res.redirect(`/messages/${receiver.username}`); // <-- 4. DIPERBAIKI
+//         res.redirect(`/messages/${receiver.username}`); // <-- 4. DIPERBAIKI
 
-    } catch (err) {
-        console.error("Error in sendMessage:", err);
-        req.flash('error', 'Gagal mengirim pesan.');
-        res.redirect('/dashboard');
-    }
-}
+//     } catch (err) {
+//         console.error("Error in sendMessage:", err);
+//         req.flash('error', 'Gagal mengirim pesan.');
+//         res.redirect('/dashboard');
+//     }
+// }
