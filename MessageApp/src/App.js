@@ -20,11 +20,9 @@ app.use((req, res, next) => {
     next();
 });
 
-
 // 1. Middleware umum (wajib sebelum session dan rute)
-app.use(express.urlencoded({ extended: true })); 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true })); 
 app.use(express.static(path.join(__dirname, '../public')));
 
 // 2. Pengaturan View Engine
@@ -50,18 +48,6 @@ app.use((req,res,next) =>{
     next();
 });
 
-// app.use(async (req, res, next, err) => {
-//     if (req.session.userId) {
-//         const user = await User.findById(req.session.userId);
-//         res.locals.user = user || null;
-//         next();
-//     } else {
-//         console.error("Error fetch user:", err);
-//         res.locals.user = null;
-//     }
-//     next();
-// });
-
 app.use(attachUser);
 
 // 4. GUNAKAN RUTE-RUTE
@@ -72,7 +58,6 @@ app.get('/', (req, res) => {
         res.redirect('/login');
     }
 });
-
 
 app.use(authRoutes);
 app.use(dashboardRoutes);
