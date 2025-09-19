@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const postController = require('../controllers/postController');
-const { isAuth } = require('../middlewares/authMiddleware');
+const { isAuthenticated } = require('../middlewares/authMiddleware');
 const postUpload = require('../config/postUpload');
 
-// router.post('/posts', isAuth, postController.createPost);
-router.post('/posts', isAuth, postUpload.single('postImage'), postController.createPost);
-router.post('/posts/:id/like', isAuth, postController.toggleLike);
+// router.post('/posts', isAuthenticated, postController.createPost);
+router.post('/posts', isAuthenticated, postUpload.single('postImage'), postController.createPost);
+router.post('/posts/:id/like', isAuthenticated, postController.toggleLike);
 
 module.exports = router;

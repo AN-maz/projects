@@ -1,39 +1,33 @@
 const User = require('../models/userModel');
 
-// MIDDLEWARE UNTUK ROUTE SETELAH LOGIN 
-const isAuth = (req, res, next) => {
-
-    // DEBUG
-    console.log('Middleware isAuth dijalankan. Isi req.session:', req.session);
-
+const isAuthenticated = (req, res, next) => {
     if (req.session && req.session.userId) {
-        next();
-    } else {
-        res.redirect('/login');
+        return next(); 
     }
+    req.flash('error', 'Anda harus login untuk mengakses halaman ini.');
+    res.redirect('/login');
 };
 
-// MIDDLEWARE UNTUK ROUTE YG BELUM LOGIN (TAMU)
 const isGuest = (req, res, next) => {
-
-    // DEBUG
-    console.log('Middleware isGuest dijalankan. Isi req.session:', req.session);
-
-    if (req.session.userId) {
-        res.redirect('/dashboard');
-    } else {
-        next();
+    if (req.session && req.session.userId) {
+        return res.redirect('/dashboard');
     }
+    next(); 
 };
 
-// Middleware inject user ke res.locals
 const attachUser = async (req, res, next) => {
     if (req.session.userId) {
         try {
             const user = await User.findById(req.session.userId);
-            res.locals.user = user; // ini bisa langsung dipakai di semua EJS
+            
+            if (user) {
+                res.locals.user = user; 
+            } else {
+                req.session.destroy(); 
+                res.locals.user = null;
+            }
         } catch (err) {
-            console.error('Gagal ambil user:', err);
+            console.error('Gagal mengambil data user:', err);
             res.locals.user = null;
         }
     } else {
@@ -42,11 +36,8 @@ const attachUser = async (req, res, next) => {
     next();
 };
 
-const isAuthenticated = (req,res,next) =>{
-    if(res.locals.user){
-        return next();
-    }
-    req.flash('error','Anda harus login untuk mengakses halaman ini');
-    res.redirect('/login');
-}
-module.exports = { isAuth, isGuest, attachUser, isAuthenticated };
+module.exports = {
+    isAuthenticated,
+    isGuest,
+    attachUser
+};

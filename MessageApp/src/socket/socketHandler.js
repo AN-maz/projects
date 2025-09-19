@@ -1,5 +1,5 @@
 const Message = require('../models/messageModel');
-const conversation = require('../models/conversationModel');
+const Conversation = require('../models/conversationModel');
 
 const onlineUsers = new Map();
 
