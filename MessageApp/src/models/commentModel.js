@@ -24,7 +24,12 @@ const CommentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Comment',
         default: null
-    }
+    },
+    replyingTo: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: null
+    },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Comment', CommentSchema);

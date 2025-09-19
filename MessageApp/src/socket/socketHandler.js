@@ -4,7 +4,7 @@ const Conversation = require('../models/conversationModel');
 const onlineUsers = new Map();
 
 module.exports = function (io) {
-    
+
     io.on('connection', (socket) => {
         console.log('✅ Seorang pengguna terhubung:', socket.id);
 
@@ -16,6 +16,12 @@ module.exports = function (io) {
         socket.on('joinConversation', (conversationId) => {
             socket.join(conversationId);
             console.log(`Socket ${socket.id} bergabung ke ruang ${conversationId}`);
+        });
+
+        // NESTED COMMENTAR REAL TIME
+        socket.on('joinPostRoom', (postId) => {
+            socket.join(postId);
+            console.log(`Socket ${socket.id} bergabung ke ruang postingan ${postId}`);
         });
 
         socket.on('sendMessage', async (messageData) => {

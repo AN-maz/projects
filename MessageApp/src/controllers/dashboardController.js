@@ -13,16 +13,17 @@ exports.showDashboard = async (req, res) => {
 
         // Ambil posts + comments + user
         const posts = await Post.find()
-            .populate('user')
+            .sort({ createdAt: -1 }) // urutkan post dari terbaru ke lama
+            .populate('user') // populate user di setiap post
             .populate({
                 path: 'comments',
                 options: { sort: { createdAt: 'asc' } }, // urutkan komentar dari lama ke baru
-                populate: {
-                    path: 'user',
-                    select: 'username profilePicture'
-                }
-            })
-            .sort({ createdAt: -1 });
+                populate: [
+                    { path: 'user', select: 'username profilePicture' },
+                    { path: 'replyingTo', select: 'username' } // tambahkan relasi replyingTo
+                ]
+            });
+
 
         // --- Susun komentar jadi nested ---
         posts.forEach(post => {

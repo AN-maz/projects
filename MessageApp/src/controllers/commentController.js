@@ -1,59 +1,36 @@
-// controllers/commentController.js
+
 const Comment = require('../models/commentModel');
-
-// exports.createComment = async (req, res) => {
-//     // Tentukan URL untuk kembali ke halaman sebelumnya
-//     const backURL = req.header('Referer') || '/dashboard';
-
-//     try {
-//         const { content, parentCommentId } = req.body;
-//         const postId = req.params.postId;
-//         const userId = req.session.userId;
-
-//         // Validasi data
-//         if (!content || !postId || !userId) {
-//             req.flash('error', 'Gagal membuat komentar. Data tidak lengkap atau Anda tidak login.');
-//             return res.redirect(backURL);
-//         }
-
-//         const newComment = new Comment({
-//             post: postId,
-//             user: userId,
-//             content: content,
-//             parentComment: parentCommentId || null // dukung nested comment
-//         });
-
-//         await newComment.save();
-//         req.flash('success', 'Komentar berhasil ditambahkan.');
-//         res.redirect(backURL);
-
-//     } catch (error) {
-//         console.error('Gagal membuat komentar:', error);
-//         req.flash('error', 'Gagal memposting komentar.');
-//         res.redirect(backURL);
-//     }
-// };
 
 exports.createComment = async (req, res) => {
     try {
+
+        const io = req.app.get('socketio');
+
         const { content, parentCommentId } = req.body;
         const postId = req.params.postId;
         const userId = req.session.userId;
 
-        const newComment = new Comment({
+        const commentData = {
             post: postId,
             user: userId,
-            content: content,
+            content,
             parentComment: parentCommentId || null
-        });
+        };
 
+        if (parentCommentId) {
+            const parentComment = await Comment.findById(parentCommentId);
+            if (parentComment) {
+                commentData.replyingTo = parentComment.user;
+            }
+        }
+        const newComment = new Comment(commentData);
         await newComment.save();
-        
-        // Populate data user agar bisa ditampilkan di front-end
-        const populatedComment = await Comment.findById(newComment._id)
-                                               .populate('user', 'username profilePicture');
 
-        // Kirim balik data komentar baru dalam format JSON
+        const populatedComment = await Comment.findById(newComment._id)
+            .populate('user', 'username profilePicture')
+            .populate('replyingTo','username');
+
+        io.to(postId).emit('newComment', populatedComment);
         res.status(201).json({ success: true, comment: populatedComment });
 
     } catch (error) {

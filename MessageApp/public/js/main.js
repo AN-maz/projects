@@ -1,11 +1,9 @@
+// public/js/main.js
 document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * Fungsi bantu generik untuk menangani aksi like (post dan komentar).
-     * @param {string} url - Endpoint API untuk like/unlike.
-     * @param {HTMLElement} form - Elemen form yang di-submit.
      */
-
     const handleLike = async (url, form) => {
         try {
             const response = await fetch(url, { method: 'POST' });
@@ -49,6 +47,51 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    /**
+     * FUNGSI BANTU: Membuat HTML komentar/balasan baru.
+     */
+    function appendComment(comment) {
+        if (!comment || !comment.user) return;
+
+        let tagHtml = '';
+        if (comment.replyingTo && comment.replyingTo.username) {
+            tagHtml = `
+                <a href="/profile/${comment.replyingTo.username}" class="text-primary text-decoration-none fw-bold me-1">
+                    @${comment.replyingTo.username}
+                </a>
+            `;
+        }
+
+        const commentHTML = `
+            <div class="d-flex mb-2" id="comment-${comment._id}">
+                <img src="/uploads/avatars/${comment.user.profilePicture}" alt="Avatar" width="30" height="30" class="rounded-circle me-2 mt-1">
+                <div class="bg-white p-2 rounded w-100">
+                    <a href="/profile/${comment.user.username}" class="fw-bold text-dark text-decoration-none small">${comment.user.username}</a>
+                    <p class="mb-1 small">
+                        ${tagHtml}
+                        ${comment.content}
+                    </p>
+                </div>
+            </div>
+        `;
+
+        if (comment.parentComment) {
+            const parentCommentEl = document.getElementById(`comment-${comment.parentComment}`);
+            if (parentCommentEl) {
+                const repliesContainer = parentCommentEl.nextElementSibling;
+                if (repliesContainer && repliesContainer.matches('.replies-container')) {
+                    repliesContainer.insertAdjacentHTML('beforeend', commentHTML);
+                }
+            }
+        } else {
+            const postCard = document.querySelector(`.post-card[data-postid="${comment.post}"]`);
+            if (postCard) {
+                const commentSection = postCard.querySelector('.card-footer');
+                commentSection.insertAdjacentHTML('afterbegin', commentHTML);
+            }
+        }
+    }
+
     // ================= EVENT LISTENER UTAMA =================
     document.body.addEventListener('submit', async (e) => {
         if (!e.target.matches('.like-form, .comment-like-form, .comment-form')) return;
@@ -91,26 +134,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (data.success) {
-                    const newComment = data.comment;
-                    const commentHTML = `
-                        <div class="d-flex mb-2" id="comment-${newComment._id}">
-                            <img src="/uploads/avatars/${newComment.user.profilePicture}" alt="Avatar" width="30" height="30" class="rounded-circle me-2 mt-1">
-                            <div class="bg-white p-2 rounded w-100">
-                                <a href="/profile/${newComment.user.username}" class="fw-bold text-dark text-decoration-none small">${newComment.user.username}</a>
-                                <p class="mb-0 small">${newComment.content}</p>
-                            </div>
-                        </div>
-                    `;
-                    
-                    if (parentId) {
-                        const parentCommentElement = document.getElementById(`comment-${parentId}`);
-                        parentCommentElement.querySelector('.replies-container').insertAdjacentHTML('beforeend', commentHTML);
-                    } else {
-                        const commentSection = form.closest('.card-footer');
-                        commentSection.insertAdjacentHTML('afterbegin', commentHTML);
-                    }
-
                     input.value = '';
+                    if (parentId) {
+                        form.closest('.reply-form-container').classList.add('d-none');
+                    }
                 }
             } catch (err) {
                 console.error('Gagal mengirim komentar:', err);
@@ -126,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
             socket.emit('register', currentUserId);
         });
 
-        // Notifikasi realtime (Toast Bootstrap)
+        // Notifikasi realtime
         const toastElement = document.getElementById('notificationToast');
         const toastTitle = document.getElementById('notificationTitle');
         const toastBody = document.getElementById('notificationBody');
@@ -182,5 +209,50 @@ document.addEventListener('DOMContentLoaded', () => {
             
             listGroup.insertBefore(convElement, listGroup.firstChild);
         });
+
+        // Listener socket untuk komentar baru
+        socket.on('newComment', (newCommentData) => {
+            appendComment(newCommentData);
+        });
     }
+
+    // ========================================================
+    // TOMBOL BALASAN (toggle form reply)
+    // ========================================================
+    document.body.addEventListener('click', (e) => {
+        if (e.target.matches('.reply-btn') || e.target.closest('.reply-btn')) {
+            e.preventDefault();
+            const replyButton = e.target.closest('.reply-btn');
+            const commentId = replyButton.dataset.commentid;
+            const replyFormContainer = document.getElementById(`reply-form-${commentId}`);
+            if (replyFormContainer) {
+                replyFormContainer.classList.toggle('d-none');
+            }
+        }
+    });
+
+    // ========================================================
+    // LOGIKA BARU: Toggle lihat/sembunyikan balasan
+    // ========================================================
+    document.body.addEventListener('click', (e) => {
+        const viewRepliesBtn = e.target.closest('.view-replies-btn');
+        if (viewRepliesBtn) {
+            e.preventDefault();
+            
+            const repliesContainer = viewRepliesBtn.closest('.replies-container');
+            const repliesList = repliesContainer.querySelector('.replies-list');
+
+            if (repliesList) {
+                const isHidden = repliesList.classList.toggle('d-none');
+                
+                const count = repliesContainer.querySelectorAll('.comment-wrapper').length;
+                if (isHidden) {
+                    viewRepliesBtn.innerHTML = `─── Lihat ${count} balasan`;
+                } else {
+                    viewRepliesBtn.innerHTML = `─── Sembunyikan balasan`;
+                }
+            }
+        }
+    });
+
 });
