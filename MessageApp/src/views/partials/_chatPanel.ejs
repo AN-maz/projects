@@ -1,37 +1,9 @@
 <h5>Pesan</h5>
 <hr>
 <div class="list-group">
-    <% if (typeof conversations !== 'undefined' && conversations.length > 0) { %>
+    <% if (conversations && conversations.length > 0) { %>
         <% conversations.forEach(conv => { %>
-            <% const otherParticipant = conv.participants.find(p => p._id.toString() !== user._id.toString()); %>
-            <% if (otherParticipant) { %>
-                
-                <a href="/messages/<%= otherParticipant.username %>" 
-                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" 
-                   id="conv-<%= conv._id %>">
-
-                    <div class="d-flex align-items-center" style="min-width: 0;">
-                        <img src="/uploads/avatars/<%= otherParticipant.profilePicture %>" alt="Avatar" width="40" height="40" class="rounded-circle me-3">
-                        <div class="flex-grow-1">
-                            <h6 class="mb-1"><%= otherParticipant.username %></h6>
-                            
-                            <p class="mb-1 small text-muted chat-preview">
-                                <% if (conv.lastMessage && conv.lastMessage.text) { %>
-                                    <%= conv.lastMessage.text %>
-                                <% } else { %>
-                                    Mulai percakapan...
-                                <% } %>
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <span class="unread-badge">
-                        <% if(conv.unreadBy && conv.unreadBy.some(id => id.equals(user._id))) { %>
-                            <span class="badge bg-primary rounded-pill">Baru</span>
-                        <% } %>
-                    </span>
-                </a>
-            <% } %>
+            <%- include('_conversationItem', { conv: conv, user: user }) %>
         <% }) %>
     <% } else { %>
         <p class="text-center text-muted">Belum ada percakapan.</p>

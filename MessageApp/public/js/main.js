@@ -1,8 +1,11 @@
 // public/js/main.js
+
 document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * Fungsi bantu generik untuk menangani aksi like (post dan komentar).
+     * @param {string} url - Endpoint API untuk like/unlike.
+     * @param {HTMLElement} form - Elemen form yang di-submit.
      */
     const handleLike = async (url, form) => {
         try {
@@ -48,11 +51,14 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     /**
-     * FUNGSI BANTU: Membuat HTML komentar/balasan baru.
+     * FUNGSI BANTU BARU (versi revisi)
+     * Untuk membuat HTML dan menampilkan komentar/balasan baru.
+     * Sudah mendukung tagging @username.
      */
     function appendComment(comment) {
         if (!comment || !comment.user) return;
 
+        // Siapkan tag @username jika ada
         let tagHtml = '';
         if (comment.replyingTo && comment.replyingTo.username) {
             tagHtml = `
@@ -78,6 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (comment.parentComment) {
             const parentCommentEl = document.getElementById(`comment-${comment.parentComment}`);
             if (parentCommentEl) {
+                // Cari kontainer balasan (saudaranya)
                 const repliesContainer = parentCommentEl.nextElementSibling;
                 if (repliesContainer && repliesContainer.matches('.replies-container')) {
                     repliesContainer.insertAdjacentHTML('beforeend', commentHTML);
@@ -134,7 +141,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (data.success) {
+                    // Tidak perlu bikin HTML manual, biar socket yang handle
                     input.value = '';
+
                     if (parentId) {
                         form.closest('.reply-form-container').classList.add('d-none');
                     }
@@ -153,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
             socket.emit('register', currentUserId);
         });
 
-        // Notifikasi realtime
+        // Notifikasi realtime (Toast Bootstrap)
         const toastElement = document.getElementById('notificationToast');
         const toastTitle = document.getElementById('notificationTitle');
         const toastBody = document.getElementById('notificationBody');
@@ -210,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
             listGroup.insertBefore(convElement, listGroup.firstChild);
         });
 
-        // Listener socket untuk komentar baru
+        // Listener socket untuk komentar baru (pakai versi revisi appendComment)
         socket.on('newComment', (newCommentData) => {
             appendComment(newCommentData);
         });
@@ -227,30 +236,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const replyFormContainer = document.getElementById(`reply-form-${commentId}`);
             if (replyFormContainer) {
                 replyFormContainer.classList.toggle('d-none');
-            }
-        }
-    });
-
-    // ========================================================
-    // LOGIKA BARU: Toggle lihat/sembunyikan balasan
-    // ========================================================
-    document.body.addEventListener('click', (e) => {
-        const viewRepliesBtn = e.target.closest('.view-replies-btn');
-        if (viewRepliesBtn) {
-            e.preventDefault();
-            
-            const repliesContainer = viewRepliesBtn.closest('.replies-container');
-            const repliesList = repliesContainer.querySelector('.replies-list');
-
-            if (repliesList) {
-                const isHidden = repliesList.classList.toggle('d-none');
-                
-                const count = repliesContainer.querySelectorAll('.comment-wrapper').length;
-                if (isHidden) {
-                    viewRepliesBtn.innerHTML = `─── Lihat ${count} balasan`;
-                } else {
-                    viewRepliesBtn.innerHTML = `─── Sembunyikan balasan`;
-                }
             }
         }
     });

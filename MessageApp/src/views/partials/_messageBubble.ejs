@@ -1,0 +1,12 @@
+<% const isMyMessage=message.sender._id.toString()===user._id.toString(); %>
+
+    <div class="d-flex <%= isMyMessage ? 'justify-content-end' : 'justify-content-start' %> mb-3">
+        <div class="<%= isMyMessage ? 'bg-primary text-white' : 'bg-light' %> p-2 rounded" style="max-width: 70%;">
+            <%- message.content %>
+                <div class="text-end <%= isMyMessage ? 'text-light opacity-75' : 'text-muted' %>"
+                    style="font-size: 0.75rem;">
+                    <%= new Date(message.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit' , minute: '2-digit' })
+                        %>
+                </div>
+        </div>
+    </div>

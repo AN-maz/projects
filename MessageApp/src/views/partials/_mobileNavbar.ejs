@@ -1,21 +1,21 @@
-<nav class="navbar bg-dark d-lg-none sticky-top">
-  <div class="container-fluid">
-    <a class="navbar-brand text-white" href="/dashboard">MessageApp</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-controls="mobileSidebar">
-      <span style="background-image: url('data:image/svg+xml;charset=utf8,%3Csvg viewBox=\'0 0 30 30\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath stroke=\'rgba(255, 255, 255, 1)\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-miterlimit=\'10\' d=\'M4 7h22M4 15h22M4 23h22\'/%3E%3C/svg%3E');" class="navbar-toggler-icon"></span>
-    </button>
-  </div>
+<nav class="navbar navbar-dark bg-dark sticky-top d-md-none">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/dashboard">MessageApp</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMobileMenu" aria-controls="offcanvasMobileMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
 </nav>
 
-<!-- <div class="offcanvas offcanvas-start bg-dark text-white" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="mobileSidebarLabel">Menu</h5>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-    <#%- include('./_rightSidebar') %>
-    <hr>
-    <h5>Pesan</h5>
-    <#%- include('./_chatPanel') %>
-  </div>
-</div> -->
+<div class="offcanvas offcanvas-end bg-dark text-white" tabindex="-1" id="offcanvasMobileMenu" aria-labelledby="offcanvasMobileMenuLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasMobileMenuLabel">Menu</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <%- include('./_rightSidebar') %>
+        <hr>
+        <h5>Pesan</h5>
+        <%- include('./_chatPanel') %>
+    </div>
+</div>

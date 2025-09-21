@@ -1,29 +1,77 @@
-/* public/css/style.css */
-
-/* ATURAN UNTUK KARTU POSTINGAN AGAR KONSISTEN */
+/* === GENERAL STYLING === */
 .post-card {
-  border: 1px solid #e9ecef;
+    border: 1px solid #e9ecef;
 }
 
 .post-image-container {
-  width: 100%; /* Memastikan container mengisi lebar kartu */
-  aspect-ratio: 16 / 9;
-  background-color: #f0f0f0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
 }
 
 .post-image-container img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* 'cover' akan mengisi frame, 'contain' akan menampilkan seluruh gambar */
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
+/* === CHAT PREVIEW === */
 .chat-preview {
-  white-space: nowrap; /* Mencegah teks turun ke baris baru */
-  overflow: hidden; /* Sembunyikan teks yang berlebih */
-  text-overflow: ellipsis; /* Tampilkan "..." di akhir teks yang terpotong */
-  max-width: 150px; /* Atur lebar maksimum pratinjau, sesuaikan jika perlu */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+/* === LAYOUT UTAMA === */
+/* Beri kelas kustom pada .row utama di layout, misal <div class="row app-layout-row"> */
+.app-layout-row {
+    flex-wrap: nowrap;
+}
+
+/* === MAIN CONTENT (default: ada padding top biar tidak ketiban navbar mobile) === */
+.main-content {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 70px;
+    /* Padding untuk mobile nav */
+}
+
+/* === BUBBLE CHAT === */
+.d-flex>.rounded {
+    max-width: 90%;
+    /* Aturan dasar untuk mobile, bisa lebih lebar */
+}
+
+
+/* === ATURAN KHUSUS DESKTOP (md ke atas) === */
+@media (min-width: 768px) {
+
+    /* Hapus padding top karena navbar mobile hilang */
+    .main-content {
+        padding-top: 1rem !important;
+        /* Kembalikan ke padding normal atau 0 */
+    }
+
+    .sidebar-sticky {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+    }
+    
+    .sidebar-sticky .list-group,
+    .sidebar-sticky .nav {
+        height: 95%;
+        /* Mungkin ingin tinggi berbeda di desktop */
+        overflow-y: auto;
+    }
+
+    /* Aturan bubble chat di desktop, buat sedikit lebih sempit */
+    .d-flex>.rounded {
+        max-width: 80%;
+    }
 }
