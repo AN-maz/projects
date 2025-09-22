@@ -44,7 +44,7 @@ exports.showConversation = async (req, res) => {
         if (!otherUser) return res.status(404).render('not-found');
 
         const conversation = await Conversation.findOne({
-            participants: { $all: [currentUser._id, otherUser._id] } 
+            participants: { $all: [currentUser._id, otherUser._id] }
         });
 
         let messages = [];
@@ -61,12 +61,12 @@ exports.showConversation = async (req, res) => {
                 select: 'username profilePicture'
             })
             .populate({
-                    path: 'lastMessage',
-                    select: 'content createdAt sender'
-                })
+                path: 'lastMessage',
+                select: 'content createdAt sender'
+            })
             .sort({ updatedAt: -1 });
 
-    
+
         res.render('conversation', {
             title: `Pesan dengan ${otherUser.username}`,
             otherUser,
@@ -81,13 +81,13 @@ exports.showConversation = async (req, res) => {
 };
 
 exports.deleteMessage = async (req, res) => {
+
     try {
         const messageId = req.params.id;
         const userId = req.session.userId;
         const io = req.app.get('socketio');
 
         const message = await Message.findById(messageId);
-
         if (!message) {
             return res.status(404).json({ success: false, message: 'Pesan tidak ditemukan.' });
         }
@@ -95,13 +95,33 @@ exports.deleteMessage = async (req, res) => {
             return res.status(403).json({ success: false, message: 'Anda tidak berhak menghapus pesan ini.' });
         }
 
+        const conversationId = message.conversationId;
         await Message.findByIdAndDelete(messageId);
+        io.to(conversationId.toString()).emit('messageDeleted', { messageId, conversationId: conversationId.toString() });
 
-        // Kirim event ke semua klien di dalam room percakapan
-        io.to(message.conversationId.toString()).emit('messageDeleted', { messageId });
-        
-        // Perbarui juga sidebar kiri (akan kita implementasikan)
-        // ... (Logika untuk update lastMessage di sidebar) ...
+        const newLastMessage = await Message.findOne({ conversationId })
+            .sort({ createdAt: -1 })
+            .populate('sender', '_id'); 
+
+        await Conversation.findByIdAndUpdate(conversationId, {
+            lastMessage: newLastMessage ? {
+                content: newLastMessage.content,
+                sender: newLastMessage.sender._id
+            } : null 
+        });
+
+        const updatedConversation = await Conversation.findById(conversationId)
+            .populate('participants', 'username profilePicture');
+            
+        updatedConversation.participants.forEach(participant => {
+            io.to(participant._id.toString()).emit('conversationUpdated', {
+                ...updatedConversation.toObject(),
+                lastMessage: newLastMessage ? {
+                    content: newLastMessage.content,
+                    sender: newLastMessage.sender._id
+                } : null
+            });
+        });
 
         res.json({ success: true, message: 'Pesan berhasil dihapus.' });
 

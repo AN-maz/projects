@@ -3,13 +3,8 @@ const router = express.Router();
 const messageController = require('../controllers/messageController');
 const { isAuthenticated } = require('../middlewares/authMiddleware');
 
-// Rute untuk MEMULAI percakapan baru (dari halaman profil)
 router.post('/messages/new/:userId', isAuthenticated, messageController.startConversation);
-// Rute untuk MELIHAT isi sebuah percakapan
 router.get('/messages/:username', isAuthenticated, messageController.showConversation);
 router.delete('/messages/:id', isAuthenticated, messageController.deleteMessage);
-
-// Rute untuk MENGIRIM pesan dari halaman percakapan
-// router.post('/messages/:username', isAuthenticated, messageController.sendMessage);
 
 module.exports = router;

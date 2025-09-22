@@ -2,7 +2,7 @@
     <div class="p-3 border-bottom d-flex align-items-center">
         <a href="/profile/<%= otherUser.username %>" class="text-decoration-none text-dark d-flex align-items-center">
             <img src="/uploads/avatars/<%= otherUser.profilePicture %>" alt="Avatar" width="40" height="40"
-                 class="rounded-circle me-3">
+                class="rounded-circle me-3">
             <h5 class="mb-0">
                 <%= otherUser.username %>
             </h5>
@@ -10,92 +10,139 @@
     </div>
 
     <div id="message-container" class="flex-grow-1 p-3" style="overflow-y: auto; height: 60vh;">
-        <% if(messages && messages.length > 0) { %>
-            <% messages.forEach(message => { %>
+        <% if(messages && messages.length> 0) { %>
+            <% messages.forEach(message=> { %>
                 <%- include('partials/_messageBubble', { message: message, user: user }) %>
-            <% }) %>
-        <% } else { %>
-            <p id="no-message-placeholder" class="text-center text-muted">Belum ada pesan. Mulai percakapan!</p>
-        <% } %>
+                    <% }) %>
+                        <% } else { %>
+                            <p id="no-message-placeholder" class="text-center text-muted">Belum ada pesan. Mulai
+                                percakapan!</p>
+                            <% } %>
     </div>
 
     <div class="p-3 border-top bg-white">
         <form id="chat-form">
             <div class="input-group">
                 <input type="text" id="message-input" name="content" class="form-control" placeholder="Ketik pesan..."
-                       required autocomplete="off">
+                    required autocomplete="off">
                 <button class="btn btn-primary" type="submit">Kirim</button>
             </div>
         </form>
     </div>
 </div>
 
-<% let conversationId = null; 
-if (typeof conversation !== 'undefined' && conversation && conversation._id) {
-    conversationId = conversation._id.toString(); 
-} else if (typeof messages !== 'undefined' && messages.length > 0) {
+<% let conversationId=null; if (typeof conversation !=='undefined' && conversation && conversation._id) {
+    conversationId=conversation._id.toString(); } else if (typeof messages !=='undefined' && messages.length> 0) {
     conversationId = messages[0].conversationId.toString();
-}
-%>
-
-<script src="/socket.io/socket.io.js"></script>
-<script>
-    const socket = io();
-    const chatForm = document.getElementById('chat-form');
-    const messageInput = document.getElementById('message-input');
-    const messageContainer = document.getElementById('message-container');
-    const noMessagePlaceholder = document.getElementById('no-message-placeholder');
-    const currentUser = { _id: '<%= user._id.toString() %>' };
-    const convId = '<%= conversationId %>';
-
-    if (convId) {
-        socket.emit('joinConversation', convId);
-        socket.emit('markAsRead', { conversationId: convId, userId: currentUser._id });
     }
+    %>
 
-    chatForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const content = messageInput.value.trim();
-        if (content && convId) {
-            socket.emit('sendMessage', {
-                conversationId: convId,
-                sender: currentUser._id,
-                content: content,
-            });
-            messageInput.value = '';
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const chatForm = document.getElementById('chat-form');
+        const messageInput = document.getElementById('message-input');
+        const messageContainer = document.getElementById('message-container');
+        const noMessagePlaceholder = document.getElementById('no-message-placeholder');
+        const currentUser = { _id: '<%= user._id.toString() %>' };
+        const convId = '<%= conversationId %>';
+
+        if (convId) {
+            socket.emit('joinConversation', convId);
+            socket.emit('markAsRead', { conversationId: convId, userId: currentUser._id });
         }
-    });
 
-    socket.on('newMessage', (message) => {
-        if (noMessagePlaceholder) noMessagePlaceholder.remove();
-        if (!message.sender) return;
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const content = messageInput.value.trim();
+            if (content && convId) {
+                socket.emit('sendMessage', {
+                    conversationId: convId,
+                    sender: currentUser._id,
+                    content: content,
+                });
+                messageInput.value = '';
+            }
+        });
 
-        const isMyMessage = message.sender._id.toString() === currentUser._id;
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('d-flex', isMyMessage ? 'justify-content-end' : 'justify-content-start', 'mb-3');
-        
-        const bubble = document.createElement('div');
-        bubble.classList.add(isMyMessage ? 'bg-primary' : 'bg-light', 'p-2', 'rounded');
-        bubble.style.maxWidth = '70%';
-        
-        // Sanitize content
-        const contentDiv = document.createElement('div');
-        contentDiv.innerHTML = message.content; 
-        bubble.appendChild(contentDiv);
+        socket.on('newMessage', (message) => {
+            if (noMessagePlaceholder) noMessagePlaceholder.remove();
+            if (!message.sender) return;
 
-        // Add timestamp
-        const timeDiv = document.createElement('div');
-        timeDiv.classList.add('text-end', isMyMessage ? 'text-light' : 'text-muted');
-        timeDiv.style.fontSize = '0.75rem';
-        timeDiv.textContent = new Date(message.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-        bubble.appendChild(timeDiv);
+            const isMyMessage = message.sender._id.toString() === currentUser._id;
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('d-flex', isMyMessage ? 'justify-content-end' : 'justify-content-start', 'mb-3');
 
-        messageElement.appendChild(bubble);
-        messageContainer.appendChild(messageElement);
-        messageContainer.scrollTop = messageContainer.scrollHeight;
-    });
+            const bubble = document.createElement('div');
+            bubble.classList.add(isMyMessage ? 'bg-primary' : 'bg-light', 'p-2', 'rounded');
+            bubble.style.maxWidth = '70%';
 
-    if (messageContainer) {
-        messageContainer.scrollTop = messageContainer.scrollHeight;
-    }
-</script>
+            // Sanitize content
+            const contentDiv = document.createElement('div');
+            contentDiv.innerHTML = message.content;
+            bubble.appendChild(contentDiv);
+
+            // Add timestamp
+            const timeDiv = document.createElement('div');
+            timeDiv.classList.add('text-end', isMyMessage ? 'text-light' : 'text-muted');
+            timeDiv.style.fontSize = '0.75rem';
+            timeDiv.textContent = new Date(message.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            bubble.appendChild(timeDiv);
+
+            messageElement.appendChild(bubble);
+            messageContainer.appendChild(messageElement);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        });
+
+        if (messageContainer) {
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+
+        // Tambahkan kode ini di dalam <script>
+
+        messageContainer.addEventListener('click', async (e) => {
+            // Cek apakah yang diklik adalah tombol hapus
+            if (e.target.classList.contains('delete-message-btn')) {
+                const messageId = e.target.dataset.messageid;
+
+                // Konfirmasi sebelum menghapus
+                if (confirm('Apakah Anda yakin ingin menghapus pesan ini?')) {
+                    try {
+                        const response = await fetch(`/messages/${messageId}`, {
+                            method: 'DELETE'
+                        });
+
+                        const result = await response.json();
+
+                        if (!result.success) {
+                            // Tampilkan pesan error jika gagal dari server
+                            alert(result.message || 'Gagal menghapus pesan.');
+                        }
+                        // Jangan lakukan apa-apa di sini jika berhasil,
+                        // biarkan socket yang menangani pembaruan UI.
+
+                    } catch (error) {
+                        console.error('Error deleting message:', error);
+                        alert('Terjadi kesalahan saat mencoba menghapus pesan.');
+                    }
+                }
+            }
+        });
+
+        // Tambahkan juga kode ini di dalam <script>
+
+        socket.on('messageDeleted', (data) => {
+            const { messageId } = data;
+
+            // Cari tombol hapus yang memiliki ID pesan yang sesuai
+            const buttonElement = document.querySelector(`.delete-message-btn[data-messageid="${messageId}"]`);
+
+            if (buttonElement) {
+                // Cari pembungkus pesan terluar dan hapus
+                const messageWrapper = buttonElement.closest('.message-bubble-wrapper');
+                if (messageWrapper) {
+                    messageWrapper.remove();
+                }
+            }
+        });
+    </script>

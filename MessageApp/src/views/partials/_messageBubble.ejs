@@ -1,28 +1,33 @@
-<% const isMyMessage = message.sender._id.toString() === user._id.toString(); %>
+<% const isMyMessage=message.sender._id.toString()===user._id.toString(); %>
 
-<div class="d-flex <%= isMyMessage ? 'justify-content-end' : 'justify-content-start' %> mb-3 message-bubble-wrapper">
-    <div class="message-actions <%= isMyMessage ? 'order-first me-2' : 'order-last ms-2' %> align-self-center">
-        <% if (isMyMessage) { %>
-            <div class="dropdown">
-                <button class="btn btn-sm btn-light py-0 px-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-ellipsis-v"></i>
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Edit</a></li>
-                    <li>
-                        <button class="dropdown-item text-danger delete-message-btn" data-messageid="<%= message._id %>">
-                            Hapus
-                        </button>
-                    </li>
-                </ul>
-            </div>
-        <% } %>
-    </div>
+    <div
+        class="d-flex <%= isMyMessage ? 'justify-content-end' : 'justify-content-start' %> mb-3 message-bubble-wrapper">
+        <div class="message-actions <%= isMyMessage ? 'order-first me-2' : 'order-last ms-2' %> align-self-center">
+            <% if (isMyMessage) { %>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-light py-0 px-1" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Edit</a></li>
+                        <li>
+                            <button class="dropdown-item text-danger delete-message-btn"
+                                data-messageid="<%= message._id %>">
+                                Hapus
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <% } %>
+        </div>
 
-    <div class="<%= isMyMessage ? 'bg-primary text-white' : 'bg-light' %> p-2 rounded" style="max-width: 70%;">
-        <%- message.content %>
-        <div class="text-end <%= isMyMessage ? 'text-light opacity-75' : 'text-muted' %>" style="font-size: 0.75rem;">
-            <%= new Date(message.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) %>
+        <div class="<%= isMyMessage ? 'bg-primary text-white' : 'bg-light' %> p-2 rounded" style="max-width: 70%;">
+            <%- message.content %>
+                <div class="text-end <%= isMyMessage ? 'text-light opacity-75' : 'text-muted' %>"
+                    style="font-size: 0.75rem;">
+                    <%= new Date(message.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit' , minute: '2-digit' })
+                        %>
+                </div>
         </div>
     </div>
-</div>
