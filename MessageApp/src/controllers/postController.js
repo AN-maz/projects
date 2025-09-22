@@ -63,4 +63,37 @@ exports.toggleLike = async (req, res) => {
         console.log(err);
         return res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server.' });
     }
-}
+};
+
+exports.deletePost = async (req, res) => {
+    try {
+        const postId = req.params.id;
+        const userId = req.session.userId;
+
+        // Cari post berdasarkan ID
+        const post = await Post.findById(postId);
+
+        // Jika post tidak ditemukan
+        if (!post) {
+            req.flash('error', 'Postingan tidak ditemukan.');
+            return res.redirect('/dashboard');
+        }
+
+        // Pastikan hanya pemilik post yang bisa menghapus
+        if (post.user.toString() !== userId) {
+            req.flash('error', 'Anda tidak berhak menghapus postingan ini.');
+            return res.redirect('/dashboard');
+        }
+
+        // Hapus post dari database
+        await Post.findByIdAndDelete(postId);
+
+        req.flash('success', 'Postingan berhasil dihapus.');
+        res.redirect('/dashboard');
+
+    } catch (err) {
+        console.error(err);
+        req.flash('error', 'Gagal menghapus postingan.');
+        res.redirect('/dashboard');
+    }
+};

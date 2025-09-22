@@ -23,22 +23,32 @@
 <% if (posts.length > 0) { %>
     <% posts.forEach(post => { %>
         <div class="card mb-4 shadow-sm post-card">
-            <div class="card-header bg-white border-0 d-flex align-items-center p-3">
-                <% if (post.user) { %>
-                    <img src="/uploads/avatars/<%= post.user.profilePicture %>" alt="Avatar" width="40" height="40" class="rounded-circle me-3">
-                    <div>
-                        <a href="/profile/<%= post.user.username %>" class="fw-bold text-dark text-decoration-none"><%= post.user.username %></a>
-                        <small class="d-block text-muted"><%= new Date(post.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %></small>
-                    </div>
-                <% } else { %>
-                    <span class="text-muted fst-italic">Pengguna Dihapus</span>
+            <!-- Gabungan kode header -->
+            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center p-3">
+                <div class="d-flex align-items-center">
+                    <% if (post.user) { %>
+                        <img src="/uploads/avatars/<%= post.user.profilePicture %>" alt="Avatar" width="40" height="40" class="rounded-circle me-3">
+                        <div>
+                            <a href="/profile/<%= post.user.username %>" class="fw-bold text-dark text-decoration-none"><%= post.user.username %></a>
+                            <small class="d-block text-muted"><%= new Date(post.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %></small>
+                        </div>
+                    <% } else { %>
+                        <span class="text-muted fst-italic">Pengguna Dihapus</span>
+                    <% } %>
+                </div>
+
+                <% if (post.user && user && post.user._id.toString() === user._id.toString()) { %>
+                    <form action="/posts/<%= post._id %>?_method=DELETE" method="POST" 
+                          onsubmit="return confirm('Apakah Anda yakin ingin menghapus postingan ini?');">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-trash"></i> Hapus
+                        </button>
+                    </form>
                 <% } %>
             </div>
 
             <% if (post.image) { %>
-                <!-- <div class="post-image-container"> -->
-                    <img src="/uploads/posts/<%= post.image %>" class="img-fluid" alt="Gambar Postingan" style="object-fit: cover; aspect-ratio: 1 / 1;">
-                <!-- </div> -->
+                <img src="/uploads/posts/<%= post.image %>" class="img-fluid" alt="Gambar Postingan" style="object-fit: cover; aspect-ratio: 1 / 1;">
             <% } %>
 
             <div class="card-body p-3">

@@ -4,8 +4,8 @@ const postController = require('../controllers/postController');
 const { isAuthenticated } = require('../middlewares/authMiddleware');
 const postUpload = require('../config/postUpload');
 
-// router.post('/posts', isAuthenticated, postController.createPost);
 router.post('/posts', isAuthenticated, postUpload.single('postImage'), postController.createPost);
 router.post('/posts/:id/like', isAuthenticated, postController.toggleLike);
+router.delete('/posts/:id', isAuthenticated, postController.deletePost);
 
 module.exports = router;

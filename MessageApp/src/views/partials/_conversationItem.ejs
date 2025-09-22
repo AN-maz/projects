@@ -15,8 +15,6 @@
 
                 <p class="mb-1 small text-muted chat-preview">
                     <% if (conv.lastMessage && conv.lastMessage.content) { %>
-
-                        <%# Cek apakah pengirim pesan terakhir adalah user yang sedang login %>
                             <% if (conv.lastMessage.sender.toString()===user._id.toString()) { %>
                                 <strong>Anda:</strong>
                                 <%= conv.lastMessage.content %>

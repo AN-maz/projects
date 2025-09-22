@@ -3,6 +3,7 @@ const expressLayouts = require("express-ejs-layouts");
 const session = require('express-session');
 const flash = require('connect-flash');
 const path = require('path');
+const methodOverride = require('method-override');
 
 const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
@@ -24,6 +25,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
 app.use(express.static(path.join(__dirname, '../public')));
+app.use(methodOverride('_method'));
 
 // 2. Pengaturan View Engine
 app.set('views', path.join(__dirname, 'views'));
