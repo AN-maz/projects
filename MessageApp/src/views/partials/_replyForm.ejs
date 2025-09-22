@@ -1,0 +1,14 @@
+<form action="/posts/<%= post._id %>/comments" method="POST"
+      class="d-flex align-items-center mt-2 comment-form"
+      data-postid="<%= post._id %>" 
+      data-parentid="<%= parentComment._id %>">
+      
+    <img src="/uploads/avatars/<%= user.profilePicture %>" 
+         alt="Avatar" width="30" height="30" class="rounded-circle me-2">
+
+    <input type="text" name="content" 
+           class="form-control form-control-sm" 
+           placeholder="Tulis balasan..." required autocomplete="off">
+
+    <button type="submit" class="btn btn-sm btn-primary ms-2">Kirim</button>
+</form>

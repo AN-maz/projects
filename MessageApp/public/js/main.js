@@ -4,8 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * Fungsi bantu generik untuk menangani aksi like (post dan komentar).
-     * @param {string} url - Endpoint API untuk like/unlike.
-     * @param {HTMLElement} form - Elemen form yang di-submit.
      */
     const handleLike = async (url, form) => {
         try {
@@ -51,9 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     /**
-     * FUNGSI BANTU BARU (versi revisi)
+     * FUNGSI BANTU BARU
      * Untuk membuat HTML dan menampilkan komentar/balasan baru.
-     * Sudah mendukung tagging @username.
      */
     function appendComment(comment) {
         if (!comment || !comment.user) return;
@@ -84,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (comment.parentComment) {
             const parentCommentEl = document.getElementById(`comment-${comment.parentComment}`);
             if (parentCommentEl) {
-                // Cari kontainer balasan (saudaranya)
                 const repliesContainer = parentCommentEl.nextElementSibling;
                 if (repliesContainer && repliesContainer.matches('.replies-container')) {
                     repliesContainer.insertAdjacentHTML('beforeend', commentHTML);
@@ -141,9 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (data.success) {
-                    // Tidak perlu bikin HTML manual, biar socket yang handle
                     input.value = '';
-
                     if (parentId) {
                         form.closest('.reply-form-container').classList.add('d-none');
                     }
@@ -219,16 +213,17 @@ document.addEventListener('DOMContentLoaded', () => {
             listGroup.insertBefore(convElement, listGroup.firstChild);
         });
 
-        // Listener socket untuk komentar baru (pakai versi revisi appendComment)
+        // Listener socket untuk komentar baru
         socket.on('newComment', (newCommentData) => {
             appendComment(newCommentData);
         });
     }
 
     // ========================================================
-    // TOMBOL BALASAN (toggle form reply)
+    // TOMBOL BALASAN, LIHAT BALASAN, DAN HAPUS KOMENTAR
     // ========================================================
-    document.body.addEventListener('click', (e) => {
+    document.body.addEventListener('click', async (e) => {
+        // Tombol "Balas"
         if (e.target.matches('.reply-btn') || e.target.closest('.reply-btn')) {
             e.preventDefault();
             const replyButton = e.target.closest('.reply-btn');
@@ -236,6 +231,48 @@ document.addEventListener('DOMContentLoaded', () => {
             const replyFormContainer = document.getElementById(`reply-form-${commentId}`);
             if (replyFormContainer) {
                 replyFormContainer.classList.toggle('d-none');
+            }
+        }
+
+        // Tombol "Lihat Balasan"
+        if (e.target.matches('.view-replies-btn')) {
+            e.preventDefault();
+            const viewBtn = e.target;
+            const repliesList = viewBtn.nextElementSibling;
+            if (repliesList) {
+                repliesList.classList.toggle('d-none');
+                if (repliesList.classList.contains('d-none')) {
+                    viewBtn.textContent = viewBtn.textContent.replace('Sembunyikan', 'Lihat');
+                } else {
+                    viewBtn.textContent = viewBtn.textContent.replace('Lihat', 'Sembunyikan');
+                }
+            }
+        }
+
+        // Tombol "Hapus Komentar"
+        if (e.target.matches('.delete-comment-btn') || e.target.closest('.delete-comment-btn')) {
+            e.preventDefault();
+            const deleteBtn = e.target.closest('.delete-comment-btn');
+            const commentId = deleteBtn.dataset.commentid;
+            
+            if (confirm('Apakah Anda yakin ingin menghapus komentar ini?')) {
+                try {
+                    const response = await fetch(`/comments/${commentId}`, {
+                        method: 'DELETE'
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        const commentWrapper = document.getElementById(`comment-wrapper-${commentId}`);
+                        if (commentWrapper) {
+                            commentWrapper.remove();
+                        }
+                    } else {
+                        alert(data.message || 'Gagal menghapus komentar.');
+                    }
+                } catch (err) {
+                    console.error('Error saat menghapus komentar:', err);
+                    alert('Terjadi kesalahan.');
+                }
             }
         }
     });

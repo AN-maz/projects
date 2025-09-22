@@ -1,69 +1,36 @@
-<div class="comment-wrapper mb-2">
+<div class="comment-wrapper mb-2" id="comment-wrapper-<%= comment._id %>">
     <div class="d-flex" id="comment-<%= comment._id %>">
         <% if (comment.user) { %>
-            <!-- Avatar -->
-            <img src="/uploads/avatars/<%= comment.user.profilePicture %>" 
-                 alt="Avatar" width="30" height="30"
-                 class="rounded-circle me-2 mt-1">
-
-            <div class="bg-white p-2 rounded w-100">
-                <!-- Username -->
-                <a href="/profile/<%= comment.user.username %>" 
-                   class="fw-bold text-dark text-decoration-none small">
-                    <%= comment.user.username %>
-                </a>
-
-                <!-- Isi komentar -->
+            <img src="/uploads/avatars/<%= comment.user.profilePicture %>" alt="Avatar" width="30" height="30" class="rounded-circle me-2 mt-1">
+            <div class="bg-light p-2 rounded w-100">
+                <a href="/profile/<%= comment.user.username %>" class="fw-bold text-dark text-decoration-none small"><%= comment.user.username %></a>
                 <p class="mb-1 small">
                     <% if (comment.replyingTo) { %>
-                        <a href="/profile/<%= comment.replyingTo.username %>" 
-                           class="text-primary text-decoration-none fw-bold me-1">
-                            @<%= comment.replyingTo.username %>
-                        </a>
+                        <a href="/profile/<%= comment.replyingTo.username %>" class="text-primary text-decoration-none fw-bold me-1">@<%= comment.replyingTo.username %></a>
                     <% } %>
                     <%= comment.content %>
                 </p>
-
-                <!-- Aksi komentar -->
                 <div class="d-flex align-items-center mt-1">
-                    <!-- Like komentar -->
-                    <form class="comment-like-form" method="POST" data-commentid="<%= comment._id %>">
-                        <!-- Tombol like/unlike akan diisi via JS/Ajax -->
-                    </form>
-
-                    <small class="text-muted mx-2">·</small>
-
-                    <!-- Tombol reply -->
-                    <a href="#" class="btn btn-link btn-sm text-decoration-none p-0 reply-btn" 
-                       data-commentid="<%= comment._id %>">
+                    <a href="#" class="btn btn-link btn-sm text-decoration-none p-0 reply-btn" data-commentid="<%= comment._id %>">
                         <strong class="text-muted">Balas</strong>
                     </a>
+                    <% if (user && comment.user && user._id.toString() === comment.user._id.toString()) { %>
+                        <small class="text-muted mx-2">·</small>
+                        <button class="btn btn-link btn-sm text-danger text-decoration-none p-0 delete-comment-btn" data-commentid="<%= comment._id %>">
+                            <strong class="text-danger">Hapus</strong>
+                        </button>
+                    <% } %>
                 </div>
             </div>
         <% } %>
     </div>
 
-    <!-- Form reply (default disembunyikan) -->
     <div class="ms-5 d-none reply-form-container" id="reply-form-<%= comment._id %>">
-        <form action="/posts/<%= post._id %>/comments" method="POST"
-              class="d-flex align-items-center mt-2 comment-form"
-              data-postid="<%= post._id %>" data-parentid="<%= comment._id %>">
-              
-            <img src="/uploads/avatars/<%= user.profilePicture %>" 
-                 alt="Avatar" width="30" height="30" class="rounded-circle me-2">
-
-            <input type="text" name="content" 
-                   class="form-control form-control-sm" 
-                   placeholder="Tulis balasan..." required autocomplete="off">
-
-            <button type="submit" class="btn btn-sm btn-primary ms-2">Kirim</button>
-        </form>
+        <%- include('_replyForm', { user: user, post: post, parentComment: comment }) %>
     </div>
 
-    <!-- Nested replies -->
     <% if (comment.replies && comment.replies.length > 0) { %>
-        <div class="replies-container ms-4">
-            <!-- Tombol toggle lihat balasan -->
+        <div class="replies-container ms-4 ps-3 border-start">
             <a href="#" class="btn btn-link btn-sm text-decoration-none p-0 fw-bold view-replies-btn">
                 ─── Lihat <%= comment.replies.length %> balasan
             </a>

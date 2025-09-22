@@ -1,9 +1,8 @@
-
+// controllers/commentController.js
 const Comment = require('../models/commentModel');
 
 exports.createComment = async (req, res) => {
     try {
-
         const io = req.app.get('socketio');
 
         const { content, parentCommentId } = req.body;
@@ -23,16 +22,17 @@ exports.createComment = async (req, res) => {
                 commentData.replyingTo = parentComment.user;
             }
         }
+
         const newComment = new Comment(commentData);
         await newComment.save();
 
         const populatedComment = await Comment.findById(newComment._id)
             .populate('user', 'username profilePicture')
-            .populate('replyingTo','username');
+            .populate('replyingTo', 'username');
 
         io.to(postId).emit('newComment', populatedComment);
-        res.status(201).json({ success: true, comment: populatedComment });
 
+        res.status(201).json({ success: true, comment: populatedComment });
     } catch (error) {
         console.error('Gagal membuat komentar:', error);
         res.status(500).json({ success: false, message: 'Gagal memposting komentar.' });
@@ -45,7 +45,6 @@ exports.toggleLikeComment = async (req, res) => {
         const userId = req.session.userId;
 
         const comment = await Comment.findById(commentId);
-
         if (!comment) {
             return res.status(404).json({ success: false, message: 'Komentar tidak ditemukan' });
         }
@@ -65,9 +64,46 @@ exports.toggleLikeComment = async (req, res) => {
             liked: !isLiked,
             likesCount: updatedComment.likes.length
         });
-
     } catch (error) {
         console.error('Gagal like komentar:', error);
         res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};
+
+// ▼▼▼ Versi JSON untuk hapus komentar (revisi gabungan) ▼▼▼
+exports.deleteComment = async (req, res) => {
+    try {
+        const commentId = req.params.id;
+        const userId = req.session.userId;
+
+        const commentToDelete = await Comment.findById(commentId);
+        if (!commentToDelete) {
+            return res.status(404).json({ success: false, message: 'Komentar tidak ditemukan.' });
+        }
+
+        if (commentToDelete.user.toString() !== userId) {
+            return res.status(403).json({ success: false, message: 'Anda tidak berhak menghapus komentar ini.' });
+        }
+
+        // Cari semua balasan rekursif
+        const findAllReplies = async (cId) => {
+            const replies = await Comment.find({ parentComment: cId });
+            let allIds = replies.map(r => r._id);
+            for (const reply of replies) {
+                const nestedIds = await findAllReplies(reply._id);
+                allIds = allIds.concat(nestedIds);
+            }
+            return allIds;
+        };
+
+        const allReplyIds = await findAllReplies(commentId);
+        const idsToDelete = [commentId, ...allReplyIds];
+
+        await Comment.deleteMany({ _id: { $in: idsToDelete } });
+
+        res.json({ success: true, message: 'Komentar berhasil dihapus.' });
+    } catch (error) {
+        console.error("Gagal menghapus komentar:", error);
+        res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server.' });
     }
 };
