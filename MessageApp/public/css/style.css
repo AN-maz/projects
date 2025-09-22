@@ -28,33 +28,40 @@
 }
 
 /* === LAYOUT UTAMA === */
-/* Beri kelas kustom pada .row utama di layout, misal <div class="row app-layout-row"> */
+
 .app-layout-row {
     flex-wrap: nowrap;
 }
 
-/* === MAIN CONTENT (default: ada padding top biar tidak ketiban navbar mobile) === */
+/* === MAIN CONTENT== */
 .main-content {
     padding-left: 1rem;
     padding-right: 1rem;
     padding-top: 70px;
-    /* Padding untuk mobile nav */
+
 }
 
 /* === BUBBLE CHAT === */
 .d-flex>.rounded {
     max-width: 90%;
-    /* Aturan dasar untuk mobile, bisa lebih lebar */
+}
+
+.message-actions {
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.message-bubble-wrapper:hover .message-actions {
+    opacity: 1;
 }
 
 
-/* === ATURAN KHUSUS DESKTOP (md ke atas) === */
+/* === ATURAN KHUSUS DESKTOP === */
 @media (min-width: 768px) {
 
-    /* Hapus padding top karena navbar mobile hilang */
     .main-content {
         padding-top: 1rem !important;
-        /* Kembalikan ke padding normal atau 0 */
+
     }
 
     .sidebar-sticky {
@@ -62,15 +69,13 @@
         top: 0;
         height: 100vh;
     }
-    
+
     .sidebar-sticky .list-group,
     .sidebar-sticky .nav {
         height: 95%;
-        /* Mungkin ingin tinggi berbeda di desktop */
         overflow-y: auto;
     }
 
-    /* Aturan bubble chat di desktop, buat sedikit lebih sempit */
     .d-flex>.rounded {
         max-width: 80%;
     }

@@ -53,7 +53,7 @@ exports.showConversation = async (req, res) => {
             messages = await Message.find({ conversationId: conversation._id })
                 .populate('sender', 'username profilePicture')
                 .sort({ createdAt: 'asc' });
-        }
+        };
 
         const conversations = await Conversation.find({ participants: currentUser._id })
             .populate({
@@ -66,6 +66,7 @@ exports.showConversation = async (req, res) => {
                 })
             .sort({ updatedAt: -1 });
 
+    
         res.render('conversation', {
             title: `Pesan dengan ${otherUser.username}`,
             otherUser,
@@ -77,4 +78,35 @@ exports.showConversation = async (req, res) => {
         console.error("Error in showConversation:", err);
         res.redirect('/dashboard');
     }
-}
+};
+
+exports.deleteMessage = async (req, res) => {
+    try {
+        const messageId = req.params.id;
+        const userId = req.session.userId;
+        const io = req.app.get('socketio');
+
+        const message = await Message.findById(messageId);
+
+        if (!message) {
+            return res.status(404).json({ success: false, message: 'Pesan tidak ditemukan.' });
+        }
+        if (message.sender.toString() !== userId) {
+            return res.status(403).json({ success: false, message: 'Anda tidak berhak menghapus pesan ini.' });
+        }
+
+        await Message.findByIdAndDelete(messageId);
+
+        // Kirim event ke semua klien di dalam room percakapan
+        io.to(message.conversationId.toString()).emit('messageDeleted', { messageId });
+        
+        // Perbarui juga sidebar kiri (akan kita implementasikan)
+        // ... (Logika untuk update lastMessage di sidebar) ...
+
+        res.json({ success: true, message: 'Pesan berhasil dihapus.' });
+
+    } catch (error) {
+        console.error("Gagal menghapus pesan:", error);
+        res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server.' });
+    }
+};
