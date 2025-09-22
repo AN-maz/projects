@@ -1,42 +1,38 @@
 // controllers/dashboardController.js
 const Post = require('../models/postModel');
 const Conversation = require('../models/conversationModel');
+const mongoose = require('mongoose');
 
 exports.showDashboard = async (req, res) => {
     try {
-        // Cek login
+
         if (!res.locals.user) {
             return res.redirect('/login');
         }
 
         const currentUser = res.locals.user;
 
-        // Ambil posts + comments + user
         const posts = await Post.find()
-            .sort({ createdAt: -1 }) // urutkan post dari terbaru ke lama
-            .populate('user') // populate user di setiap post
+            .sort({ createdAt: -1 })
+            .populate('user')
             .populate({
                 path: 'comments',
-                options: { sort: { createdAt: 'asc' } }, // urutkan komentar dari lama ke baru
+                options: { sort: { createdAt: 'asc' } },
                 populate: [
                     { path: 'user', select: 'username profilePicture' },
-                    { path: 'replyingTo', select: 'username' } // tambahkan relasi replyingTo
+                    { path: 'replyingTo', select: 'username' }
                 ]
             });
 
-
-        // --- Susun komentar jadi nested ---
         posts.forEach(post => {
             const commentMap = {};
             const nestedComments = [];
 
-            // Buat map komentar berdasarkan ID
             post.comments.forEach(comment => {
                 commentMap[comment._id] = comment;
-                comment.replies = []; // buat tempat untuk balasan
+                comment.replies = [];
             });
 
-            // Susun struktur nested
             post.comments.forEach(comment => {
                 if (comment.parentComment) {
                     if (commentMap[comment.parentComment]) {
@@ -47,20 +43,61 @@ exports.showDashboard = async (req, res) => {
                 }
             });
 
-            // Ganti array comments dengan nested structure
             post.comments = nestedComments;
         });
-        // --- Akhir nested comments ---
 
-        // Ambil conversations
-        const conversations = await Conversation.find({ participants: currentUser._id })
-            .populate({
-                path: 'participants',
-                select: 'username profilePicture'
-            })
-            .sort({ updatedAt: -1 });
+        const conversations = await Conversation.aggregate([
 
-        // Render dashboard
+            {
+                $match: { participants: new mongoose.Types.ObjectId(currentUser._id) }
+            },
+
+            {
+                $lookup: {
+                    from: 'messages',
+                    let: { convId: '$_id' },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ['$conversationId', '$$convId'] } } },
+                        { $sort: { createdAt: -1 } },
+                        { $limit: 1 }
+                    ],
+                    as: 'lastMessage'
+                }
+            },
+
+            {
+                $unwind: {
+                    path: '$lastMessage',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'participants',
+                    foreignField: '_id',
+                    as: 'participantsInfo'
+                }
+            },
+
+            {
+                $addFields: {
+                    participants: '$participantsInfo'
+                }
+            },
+
+            {
+                $sort: { updatedAt: -1 }
+            },
+
+            {
+                $project: {
+                    participantsInfo: 0
+                }
+            }
+        ]);
+
         res.render('dashboard', {
             title: 'Dashboard',
             posts,
