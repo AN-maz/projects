@@ -9,7 +9,9 @@
         </a>
     </div>
 
-    <div id="message-container" class="flex-grow-1 p-3" style="overflow-y: auto; height: 60vh;">
+    <div id="message-container" class="flex-grow-1 p-3" style="overflow-y: auto; height: 60vh;"
+        data-conversation-id="<%= conversationId%>" data-user-id="<%= user._id.toString() %>">
+
         <% if(messages && messages.length> 0) { %>
             <% messages.forEach(message=> { %>
                 <%- include('partials/_messageBubble', { message: message, user: user }) %>
@@ -31,118 +33,28 @@
     </div>
 </div>
 
-<% let conversationId=null; if (typeof conversation !=='undefined' && conversation && conversation._id) {
-    conversationId=conversation._id.toString(); } else if (typeof messages !=='undefined' && messages.length> 0) {
-    conversationId = messages[0].conversationId.toString();
-    }
-    %>
+<div class="modal fade" id="editMessageModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Pesan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-message-form">
+                    <div class="mb-3">
+                        <label for="editMessageInput" class="form-label">Pesan:</label>
+                        <textarea class="form-control" id="editMessageInput" rows="3" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary" id="save-edit-btn">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const socket = io();
-        const chatForm = document.getElementById('chat-form');
-        const messageInput = document.getElementById('message-input');
-        const messageContainer = document.getElementById('message-container');
-        const noMessagePlaceholder = document.getElementById('no-message-placeholder');
-        const currentUser = { _id: '<%= user._id.toString() %>' };
-        const convId = '<%= conversationId %>';
-
-        if (convId) {
-            socket.emit('joinConversation', convId);
-            socket.emit('markAsRead', { conversationId: convId, userId: currentUser._id });
-        }
-
-        chatForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const content = messageInput.value.trim();
-            if (content && convId) {
-                socket.emit('sendMessage', {
-                    conversationId: convId,
-                    sender: currentUser._id,
-                    content: content,
-                });
-                messageInput.value = '';
-            }
-        });
-
-        socket.on('newMessage', (message) => {
-            if (noMessagePlaceholder) noMessagePlaceholder.remove();
-            if (!message.sender) return;
-
-            const isMyMessage = message.sender._id.toString() === currentUser._id;
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('d-flex', isMyMessage ? 'justify-content-end' : 'justify-content-start', 'mb-3');
-
-            const bubble = document.createElement('div');
-            bubble.classList.add(isMyMessage ? 'bg-primary' : 'bg-light', 'p-2', 'rounded');
-            bubble.style.maxWidth = '70%';
-
-            // Sanitize content
-            const contentDiv = document.createElement('div');
-            contentDiv.innerHTML = message.content;
-            bubble.appendChild(contentDiv);
-
-            // Add timestamp
-            const timeDiv = document.createElement('div');
-            timeDiv.classList.add('text-end', isMyMessage ? 'text-light' : 'text-muted');
-            timeDiv.style.fontSize = '0.75rem';
-            timeDiv.textContent = new Date(message.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-            bubble.appendChild(timeDiv);
-
-            messageElement.appendChild(bubble);
-            messageContainer.appendChild(messageElement);
-            messageContainer.scrollTop = messageContainer.scrollHeight;
-        });
-
-        if (messageContainer) {
-            messageContainer.scrollTop = messageContainer.scrollHeight;
-        }
-
-        // Tambahkan kode ini di dalam <script>
-
-        messageContainer.addEventListener('click', async (e) => {
-            // Cek apakah yang diklik adalah tombol hapus
-            if (e.target.classList.contains('delete-message-btn')) {
-                const messageId = e.target.dataset.messageid;
-
-                // Konfirmasi sebelum menghapus
-                if (confirm('Apakah Anda yakin ingin menghapus pesan ini?')) {
-                    try {
-                        const response = await fetch(`/messages/${messageId}`, {
-                            method: 'DELETE'
-                        });
-
-                        const result = await response.json();
-
-                        if (!result.success) {
-                            // Tampilkan pesan error jika gagal dari server
-                            alert(result.message || 'Gagal menghapus pesan.');
-                        }
-                        // Jangan lakukan apa-apa di sini jika berhasil,
-                        // biarkan socket yang menangani pembaruan UI.
-
-                    } catch (error) {
-                        console.error('Error deleting message:', error);
-                        alert('Terjadi kesalahan saat mencoba menghapus pesan.');
-                    }
-                }
-            }
-        });
-
-        // Tambahkan juga kode ini di dalam <script>
-
-        socket.on('messageDeleted', (data) => {
-            const { messageId } = data;
-
-            // Cari tombol hapus yang memiliki ID pesan yang sesuai
-            const buttonElement = document.querySelector(`.delete-message-btn[data-messageid="${messageId}"]`);
-
-            if (buttonElement) {
-                // Cari pembungkus pesan terluar dan hapus
-                const messageWrapper = buttonElement.closest('.message-bubble-wrapper');
-                if (messageWrapper) {
-                    messageWrapper.remove();
-                }
-            }
-        });
-    </script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/chat.js" defer></script>

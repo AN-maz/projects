@@ -6,5 +6,6 @@ const { isAuthenticated } = require('../middlewares/authMiddleware');
 router.post('/messages/new/:userId', isAuthenticated, messageController.startConversation);
 router.get('/messages/:username', isAuthenticated, messageController.showConversation);
 router.delete('/messages/:id', isAuthenticated, messageController.deleteMessage);
+router.put('/messages/:id', isAuthenticated, messageController.editMessage);
 
 module.exports = router;

@@ -67,11 +67,17 @@ exports.showConversation = async (req, res) => {
             .sort({ updatedAt: -1 });
 
 
+        let conversationId = null;
+        if (conversation) {
+            conversationId = conversation._id.toString();
+        }
+
         res.render('conversation', {
             title: `Pesan dengan ${otherUser.username}`,
             otherUser,
             messages,
-            conversations
+            conversations,
+            conversationId
         });
 
     } catch (err) {
@@ -101,18 +107,18 @@ exports.deleteMessage = async (req, res) => {
 
         const newLastMessage = await Message.findOne({ conversationId })
             .sort({ createdAt: -1 })
-            .populate('sender', '_id'); 
+            .populate('sender', '_id');
 
         await Conversation.findByIdAndUpdate(conversationId, {
             lastMessage: newLastMessage ? {
                 content: newLastMessage.content,
                 sender: newLastMessage.sender._id
-            } : null 
+            } : null
         });
 
         const updatedConversation = await Conversation.findById(conversationId)
             .populate('participants', 'username profilePicture');
-            
+
         updatedConversation.participants.forEach(participant => {
             io.to(participant._id.toString()).emit('conversationUpdated', {
                 ...updatedConversation.toObject(),
@@ -127,6 +133,40 @@ exports.deleteMessage = async (req, res) => {
 
     } catch (error) {
         console.error("Gagal menghapus pesan:", error);
+        res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server.' });
+    }
+};
+
+exports.editMessage = async (req, res) => {
+    try {
+        const messageId = req.params.id;
+        const { content } = req.body;
+        const userId = res.locals.user._id;
+
+        const message = await Message.findById(messageId);
+
+        if (!message) {
+            return res.status(404).json({ success: false, message: 'Pesan tidak ditemukan.' });
+        }
+
+        if (message.sender.toString() !== userId.toString()) {
+            return res.status(403).json({ success: false, message: 'Anda tidak berhak mengedit pesan ini.' });
+        }
+
+        message.content = content;
+        message.isEdited = true;
+        await message.save();
+
+        const io = req.app.get('socketio');
+        io.to(message.conversationId.toString()).emit('messageEdited', {
+            messageId: message._id,
+            content: message.content
+        });
+
+        res.json({ success: true, message: 'Pesan berhasil diperbarui.' });
+
+    } catch (error) {
+        console.error("Gagal mengedit pesan:", error);
         res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server.' });
     }
 };
