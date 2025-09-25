@@ -6,7 +6,7 @@ exports.createPost = async (req, res) => {
         const { content } = req.body;
         const userId = req.session.userId;
 
-        if (!content || content.trims() === '') {
+        if (!content || content.trim() === '') {
             req.flash('error', 'Konten postingan tidak boleh kosong');
             return res.redirect('/dashboard');
         }

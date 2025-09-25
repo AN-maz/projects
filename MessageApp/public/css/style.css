@@ -3,6 +3,20 @@
     border: 1px solid #e9ecef;
 }
 
+/* Kustomisasi gelembung pesan saya (BIRU) */
+.my-message-bubble {
+    background-color: #5865F2;
+    /* Warna biru ala Discord */
+    color: white;
+}
+
+/* Kustomisasi gelembung pesan orang lain (PUTIH/ABU-ABU) */
+.their-message-bubble {
+    background-color: #E3E5E8;
+    /* Warna abu-abu terang */
+    color: #060607;
+}
+
 .post-image-container {
     width: 100%;
     aspect-ratio: 16 / 9;

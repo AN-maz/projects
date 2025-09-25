@@ -5,6 +5,7 @@ const onlineUsers = new Map();
 
 module.exports = function (io) {
 
+
     io.on('connection', (socket) => {
         console.log('✅ Seorang pengguna terhubung:', socket.id);
 
@@ -36,7 +37,7 @@ module.exports = function (io) {
 
                 if (!conversation) return;
 
-                const receiverId = conversation.participants.find(id => id.toString() !== messageData.sender);
+                const receiverId = conversation.participants.find(id => id.toString() !== messageData.sender._id);
 
                 await Conversation.findByIdAndUpdate(
                     messageData.conversationId,
@@ -80,8 +81,24 @@ module.exports = function (io) {
 
         socket.on('markAsRead', async ({ conversationId, userId }) => {
             try {
-                await Conversation.findByIdAndUpdate(conversationId, {
-                    $pull: { unreadBy: userId }
+                // await Conversation.findByIdAndUpdate(conversationId, {
+                //     $pull: { unreadBy: userId }
+                // });
+
+                const conversation = await Conversation.findByIdAndUpdate(
+                    conversationId,
+                    { $pull: { unreadBy: userId } },
+                    { new: true }
+                ).populate('participants', 'username profilePicture');
+
+                if (!conversation) return;
+
+                conversation.participants.forEach(participants => {
+                    const participantSocketId = onlineUsers.get(participants._id.toString());
+
+                    if (partisipantSocketId) {
+                        io.to(participantSockedId).emit('conversationUpdated', conversation);
+                    }
                 });
             } catch (err) {
                 console.error('Gagal menandai sudah dibaca:', err);

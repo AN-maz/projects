@@ -1,4 +1,3 @@
-// Menunggu seluruh halaman dimuat sebelum menjalankan skrip
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- INISIALISASI VARIABEL ---
@@ -8,11 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const messageInput = document.getElementById('message-input');
     const noMessagePlaceholder = document.getElementById('no-message-placeholder');
 
-    // Mengambil data dari atribut HTML
     const convId = messageContainer.dataset.conversationId;
     const currentUserId = messageContainer.dataset.userId;
 
-    // Variabel untuk Modal Edit
     const editMessageModalEl = document.getElementById('editMessageModal');
     const editMessageModal = new bootstrap.Modal(editMessageModalEl);
     const editMessageInput = document.getElementById('editMessageInput');
@@ -21,12 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNGSI UTAMA ---
 
-    // Bergabung ke room socket
     if (convId) {
         socket.emit('joinConversation', convId);
+        socket.emit('markAsRead', { conversationId: convId, userId: currentUserId });
     }
 
-    // Auto-scroll ke pesan terakhir
     const scrollToBottom = () => {
         if (messageContainer) {
             messageContainer.scrollTop = messageContainer.scrollHeight;
@@ -34,12 +30,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     scrollToBottom();
 
-    // Fungsi untuk membuat HTML gelembung pesan secara dinamis
     const createMessageBubbleHTML = (message) => {
         const isMyMessage = message.sender._id.toString() === currentUserId;
         const formattedTime = new Date(message.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
-        // Membuat dropdown menu HANYA jika itu pesan kita
+        const bubbleClass = isMyMessage ? 'my-message-bubble' : 'their-message-bubble';
+        const alignmentClass = isMyMessage ? 'justify-content-end' : 'justify-content-start';
+        const actionsOrderClass = isMyMessage ? 'order-first me-2' : 'order-last ms-2';
+        const timeClass = isMyMessage ? 'text-light opacity-75' : 'text-muted';
+
         const actionsMenu = isMyMessage ? `
             <div class="dropdown">
                 <button class="btn btn-sm btn-light py-0 px-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -55,14 +54,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const editedIndicator = message.isEdited ? `<span class="opacity-75 fst-italic" style="font-size: 0.7rem;">(diedit)</span>` : '';
 
         return `
-            <div class="d-flex ${isMyMessage ? 'justify-content-end' : 'justify-content-start'} mb-3 message-bubble-wrapper">
-                <div class="message-actions ${isMyMessage ? 'order-first me-2' : 'order-last ms-2'} align-self-center">
+            <div class="d-flex ${alignmentClass} mb-3 message-bubble-wrapper">
+                <div class="message-actions ${actionsOrderClass} align-self-center">
                     ${actionsMenu}
                 </div>
-                <div class="${isMyMessage ? 'my-message-bubble' : 'their-message-bubble'} p-2 rounded" style="max-width: 70%;">
+                <div class="${bubbleClass} p-2 rounded" style="max-width: 70%;">
                     <div class="message-content">${message.content}</div>
                     ${editedIndicator}
-                    <div class="text-end ${isMyMessage ? 'text-light opacity-75' : 'text-muted'}" style="font-size: 0.75rem;">
+                    <div class="text-end ${timeClass}" style="font-size: 0.75rem;">
                         ${formattedTime}
                     </div>
                 </div>
@@ -72,7 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- EVENT LISTENERS ---
 
-    // Mengirim pesan baru
     chatForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const content = messageInput.value.trim();
@@ -86,7 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Event listener terpusat untuk Edit & Hapus
     messageContainer.addEventListener('click', async (e) => {
         if (e.target.classList.contains('delete-message-btn')) {
             const messageId = e.target.dataset.messageid;
@@ -102,7 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Menyimpan perubahan dari modal edit
     saveEditBtn.addEventListener('click', async () => {
         const newContent = editMessageInput.value.trim();
         if (newContent && messageToEditId) {
@@ -117,15 +113,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- SOCKET LISTENERS ---
 
-    // Menerima pesan baru
     socket.on('newMessage', (message) => {
         if (noMessagePlaceholder) noMessagePlaceholder.remove();
+
         const messageHTML = createMessageBubbleHTML(message);
         messageContainer.insertAdjacentHTML('beforeend', messageHTML);
+
         scrollToBottom();
     });
 
-    // Menerima event pesan dihapus
     socket.on('messageDeleted', (data) => {
         const messageElement = document.querySelector(`.delete-message-btn[data-messageid="${data.messageId}"]`);
         if (messageElement) {
@@ -133,13 +129,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Menerima event pesan diedit
     socket.on('messageEdited', (data) => {
         const messageElement = document.querySelector(`.edit-message-btn[data-messageid="${data.messageId}"]`);
         if (messageElement) {
             const wrapper = messageElement.closest('.message-bubble-wrapper');
             wrapper.querySelector('.message-content').textContent = data.content;
-            
+
             let editedSpan = wrapper.querySelector('.fst-italic');
             if (!editedSpan) {
                 editedSpan = document.createElement('span');
@@ -150,4 +145,51 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    socket.on('conversationUpdated', (updatedConv) => {
+        const listGroup = document.querySelector('.list-group');
+        if (!listGroup) return;
+
+        let convElement = document.getElementById(`conv-${updatedConv._id}`);
+
+        const otherParticipant = updatedConv.participants.find(p => p._id.toString() !== currentUserId);
+        if (!otherParticipant) return;
+
+        // Logika untuk menentukan apakah badge "Baru" harus ditampilkan
+        const hasUnread = updatedConv.unreadBy && updatedConv.unreadBy.includes(currentUserId);
+        const badgeHTML = hasUnread ? `<span class="badge bg-primary rounded-pill">Baru</span>` : '';
+
+        // Logika untuk menampilkan preview pesan terakhir
+        let previewText = "Mulai percakapan...";
+        if (updatedConv.lastMessage && updatedConv.lastMessage.text) {
+            const prefix = updatedConv.lastMessage.sender.toString() === currentUserId ? "Anda: " : "";
+            previewText = prefix + updatedConv.lastMessage.text;
+        }
+
+        if (convElement) {
+            // Jika elemen percakapan sudah ada di daftar, cukup perbarui isinya
+            convElement.querySelector('.chat-preview').textContent = previewText;
+            convElement.querySelector('.unread-badge').innerHTML = badgeHTML;
+        } else {
+            // Jika ini percakapan baru, buat elemennya dari awal
+            convElement = document.createElement('a');
+            convElement.href = `/messages/${otherParticipant.username}`;
+            convElement.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center';
+            convElement.id = `conv-${updatedConv._id}`;
+            convElement.innerHTML = `
+                <div class="d-flex align-items-center" style="min-width: 0;">
+                    <img src="/uploads/avatars/${otherParticipant.profilePicture}" alt="Avatar" width="40" height="40" class="rounded-circle me-3">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">${otherParticipant.username}</h6>
+                        <p class="mb-1 small text-muted chat-preview">${previewText}</p>
+                    </div>
+                </div>
+                <span class="unread-badge">${badgeHTML}</span>
+            `;
+        }
+
+        // Selalu pindahkan percakapan yang baru diupdate ke paling atas
+        listGroup.prepend(convElement);
+    });
+
 });
