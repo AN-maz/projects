@@ -14,3 +14,13 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+// NAV SCROLL
+window.addEventListener('scroll', function () {
+    const nav = this.document.querySelector('nav');
+    if (window.scrollY > 550) {
+        nav.classList.add('scrolled');
+    } else {
+        nav.classList.remove('scrolled');
+    }
+});

@@ -9,10 +9,23 @@ nav {
     justify-content: space-between;
     align-items: center;
     z-index: 1000;
-
-
+    /* background-color: rgba(128,128,128,0);  */
+    /* backdrop-filter: blur(5px); */
+    transition: background-color 0.5s ease;
 }
 
+nav.scrolled {
+     background-color: rgba(42, 58, 127); 
+}
+nav.scrolled .nav-list a {
+  color: white; 
+}
+
+nav.scrolled .nav-list a:hover,
+nav.scrolled .nav-list a.active {
+  background-color: white; 
+  color: rgba(42, 58, 127); 
+}
 .nav-list ul {
     list-style: none;
     gap: 1em;
@@ -29,6 +42,6 @@ nav {
 
 .nav-list a:hover,
 .nav-list a.active {
-    background-color: #3b4a99;
+    background-color:rgba(42, 58, 127);
     color: white;
 }
