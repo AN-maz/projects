@@ -13,19 +13,19 @@ main {}
 body {
     font-family: Arial, sans-serif;
     color: var(--text-color);
-    
+
 }
 
 section {
     display: flex;
-    min-height: 80vh; 
-    padding: 4em 3em; 
-    gap: 3em; 
+    min-height: 80vh;
+    padding: 4em 3em;
+    gap: 3em;
 }
 
 section .kiri,
 section .kanan {
-    flex: 1; 
+    flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -37,12 +37,14 @@ section .kanan {
     padding: 1em 2em;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    width: 220px;   
+    width: 220px;
     text-align: center;
 }
+
 .btn:hover {
     background-color: var(--dark-blue);
 }
+
 .btn a {
     text-decoration: none;
     color: var(--white);
@@ -52,29 +54,34 @@ section .kanan {
 
 /* === PART 1 === */
 .part-1 {
-    padding: 0; 
+    padding: 0;
     min-height: 100vh;
 }
-.part-1 .kanan{
+
+.part-1 .kanan {
     gap: 1em;
     text-align: justify;
     padding-right: 4em;
 }
+
 .part-1 .kiri {
     background-image: url(/assets/images/hero-background.jpg);
     background-size: cover;
     background-position: center;
-    padding: 3em; 
+    padding: 3em;
 }
+
 .part-1 .kiri .hero-text h1 {
     font-size: 3.5em;
     margin-bottom: 0.1em;
     color: black;
 }
-.hero-text{
+
+.hero-text {
     padding-bottom: 6em;
 }
-.kanan h2{
+
+.kanan h2 {
     color: black;
 }
 
@@ -84,17 +91,20 @@ section .kanan {
     padding-top: 1em;
     /* font-style: italic; */
 }
+
 .part-2 ul {
     /* list-style: none;  */
     padding-left: 0;
     margin-left: 1.5em;
-    line-height: 1.7; 
+    line-height: 1.7;
 }
+
 .part-2 ul li span {
     font-weight: bold;
     color: var(--heading-color);
 }
-.title-2{
+
+.title-2 {
     font-size: 50px;
     color: black;
 }
@@ -104,25 +114,52 @@ section .kanan {
 
 }
 
-.part-2 .kanan .title-2{
+.part-2 .kanan .title-2 {
     padding-top: 0.5em;
 }
 
 /* part-3 */
-.part-3{
+.part-3 {
     display: flex;
     flex-direction: column;
     background-color: #2a3a7f;
-    min-height: 70vh;
+    min-height: 50vh;
     color: white;
     text-align: center;
     justify-content: center;
-    gap: 2em; 
+    gap: 2em;
 }
-.part-3 h1{
+
+.part-3 h1 {
     /* font-weight: bold; */
     font-size: 70px;
 }
-.part-3 p{
+
+.part-3 p {
     font-size: 20px;
+}
+
+/* part-4 */
+.part-4 {
+    flex-direction: column;
+    justify-content: center;
+    min-height: 50vh;
+    gap: 0.5em;
+    padding-left: 5em;
+    font-size: 20px;
+    text-align: justify;
+    padding-right: 5em;
+}
+
+.part-4 h1 {
+    font-size: 50px;
+    color: black;
+}
+
+.part-4 li {
+    list-style-type: decimal;
+}
+
+.part-4 ul {
+    padding-left: 1.5em;
 }
