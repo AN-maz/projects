@@ -1,0 +1,62 @@
+/* MAIN SECTION */
+main {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+}
+
+.kiri {
+    flex: 1;
+    background-image: url(/assets/images/hero-background.jpg);
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    
+}
+.font{
+    margin-bottom: 10em;
+}
+.kiri h1 {
+    font-size: 3.5em;
+    margin-bottom: 0.2em;
+    font-weight: bold;
+    margin-left: 1em;
+
+}
+
+.kanan {
+    flex: 1;
+    padding: 3em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.kanan button {
+    background-color: #3b4a99;
+    border: none;
+    padding: 1em 2em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 200px;
+}
+
+.kanan button:hover {
+    background-color: #2a3a7f;
+}
+
+.kanan p {
+    line-height: 1.8;
+    color: #555;
+    margin-bottom: 2em;
+    text-align: justify;
+}
+
+.kanan button a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    font-size: 1em;
+}
