@@ -163,3 +163,54 @@ section .kanan {
 .part-4 ul {
     padding-left: 1.5em;
 }
+
+/* Tablet */
+@media (max-width: 992px) {
+  .part-1,
+  .part-2,
+  .part-3,
+  .part-4 {
+    flex-direction: column;   /* kalau ada yang 2 kolom, jadi vertikal */
+    text-align: center;       /* biar lebih rapi */
+    padding: 3em 1.5em;
+  }
+
+  .part-1 img,
+  .part-2 img,
+  .part-3 img,
+  .part-4 img {
+    max-width: 80%;   /* gambar mengecil */
+    margin: 0 auto;   /* biar center */
+  }
+}
+
+/* HP */
+@media (max-width: 576px) {
+  main section {
+    padding: 2em 1em;
+  }
+
+  .part-1 h1,
+  .part-2 h1,
+  .part-3 h1,
+  .part-4 h1 {
+    font-size: 1.5rem; /* judul lebih kecil */
+  }
+
+  .part-1 p,
+  .part-2 p,
+  .part-3 p,
+  .part-4 p {
+    font-size: 0.9rem;
+  }
+
+  .nav-list ul {
+    flex-direction: column;
+    gap: 0.5em;
+  }
+
+  .nav-list a {
+    display: block;
+    padding: 0.75em;
+  }
+}

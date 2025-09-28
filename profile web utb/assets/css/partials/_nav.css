@@ -1,47 +1,113 @@
 /* NAVBAR */
 nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    padding: 1.5em;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 1000;
-    /* background-color: rgba(128,128,128,0);  */
-    /* backdrop-filter: blur(5px); */
-    transition: background-color 0.5s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 1.5em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  /* background-color: rgba(128,128,128,0);  */
+  /* backdrop-filter: blur(5px); */
+  transition: background-color 0.5s ease;
+
+
 }
 
 nav.scrolled {
-     background-color: rgba(42, 58, 127); 
+  background-color: rgba(42, 58, 127);
 }
+
 nav.scrolled .nav-list a {
-  color: white; 
+  color: white;
 }
 
 nav.scrolled .nav-list a:hover,
 nav.scrolled .nav-list a.active {
-  background-color: white; 
-  color: rgba(42, 58, 127); 
+  background-color: white;
+  color: rgba(42, 58, 127);
 }
+
 .nav-list ul {
-    list-style: none;
-    gap: 1em;
-    display: flex;
+  list-style: none;
+  gap: 1em;
+  display: flex;
 }
 
 .nav-list a {
-    text-decoration: none;
-    color: black;
-    font-weight: bold;
-    padding: 0.75em 1.25em;
-    transition: all 0.3s
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+  padding: 0.75em 1.25em;
+  transition: all 0.3s
 }
 
 .nav-list a:hover,
 .nav-list a.active {
-    background-color:rgba(42, 58, 127);
+  background-color: rgba(42, 58, 127);
+  color: white;
+}
+
+/* SUGUHAN */
+.hamburger-menu {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.hamburger-menu .bar {
+  width: 25px;
+  height: 3px;
+  background: white;
+  transition: 0.3s;
+}
+
+
+@media (max-width: 989px) {
+  nav{
+    background-color: rgba(42, 58, 127,0.3);
+    backdrop-filter: blur(5px);
+  }
+  .nav-list {
+    display: block;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: black;
+    padding: 1em;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav-list.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .hamburger-menu {
+    display: flex;
+  }
+
+  .nav-list a {
+    display: block;
+    padding: 1em;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0;
     color: white;
+
+  }
+
+  .nav-list ul {
+    display: flex;
+    flex-direction: column;
+  }
 }

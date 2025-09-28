@@ -24,3 +24,11 @@ window.addEventListener('scroll', function () {
         nav.classList.remove('scrolled');
     }
 });
+
+// HAMBURGER
+const burger = document.querySelector('.hamburger-menu');
+const navList = document.querySelector('.nav-list');
+
+burger.addEventListener('click', () => {
+  navList.classList.toggle('active');
+});
