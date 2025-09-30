@@ -3,7 +3,8 @@
 @import "partials/_main.css";
 @import "partials/_rencana-studi.css";
 @import "partials/_pengajar.css";
-
+@import url('partials/_pengajar-slider.css');
+    
 * {
     margin: 0;
     padding: 0;

@@ -57,3 +57,31 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 })
+
+
+ var swiper = new Swiper(".mySwiper", {
+            // Berapa slide yang terlihat
+            slidesPerView: 1, 
+            // Jarak antar slide
+            spaceBetween: 30,
+            // Aktifkan loop tak terbatas
+            loop: true,
+            // Pengaturan navigasi (panah)
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            // Pengaturan responsive
+            breakpoints: {
+                // Saat lebar layar 640px atau lebih
+                640: {
+                    slidesPerView: 2,
+                    spaceBetween: 20,
+                },
+                // Saat lebar layar 1024px atau lebih
+                1024: {
+                    slidesPerView: 3,
+                    spaceBetween: 30,
+                },
+            },
+        });
