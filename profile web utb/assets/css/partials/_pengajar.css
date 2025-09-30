@@ -12,8 +12,32 @@
     padding-bottom: 1em;
 }
 
-.kadev{
+.kadev {
     display: flex;
     /* align-items: flex-start; */
     gap: 3em;
+}
+
+@media (max-width: 992px) {
+
+    .kadev {
+        flex-direction: column; 
+        align-items: center;   
+        gap: 2em;    
+    }
+
+    .kadev .img-kadev {
+        order: 1; 
+        width: 100%; 
+        max-width: 400px; 
+    }
+
+ 
+    .kadev .des {
+        order: 2; 
+    }
+    
+    .kadev h1 {
+        text-align: center;
+    }
 }
