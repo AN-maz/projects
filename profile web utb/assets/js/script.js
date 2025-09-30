@@ -30,5 +30,30 @@ const burger = document.querySelector('.hamburger-menu');
 const navList = document.querySelector('.nav-list');
 
 burger.addEventListener('click', () => {
-  navList.classList.toggle('active');
+    navList.classList.toggle('active');
 });
+
+// Table BTN
+document.addEventListener("DOMContentLoaded", function () {
+    const accordionHeaders = document.querySelectorAll(".accordion-header");
+
+    accordionHeaders.forEach(header => {
+        header.addEventListener("click", function() {
+            const currentActiveHeader = document.querySelector(".accordion-header.active");
+
+            if (currentActiveHeader && currentActiveHeader !== this) {
+                currentActiveHeader.classList.remove("active");
+                currentActiveHeader.nextElementSibling.style.maxHeight = null;
+            }
+
+            this.classList.toggle("active");
+            const accordionContent = this.nextElementSibling;
+
+            if (this.classList.contains('active')) {
+                accordionContent.style.maxHeight = accordionContent.scrollHeight + "px";
+            } else {
+                accordionContent.style.maxHeight = null;
+            }
+        });
+    });
+})

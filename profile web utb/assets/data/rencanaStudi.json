@@ -1,0 +1,366 @@
+[{
+        "judul": "Tahun Pertama",
+        "tipe": "semester",
+        "konten": [{
+                "subjudul": "Semester 1",
+                "matkul": [{
+                        "nama": "Algoritma dan Pemograman 1",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Struktur Data",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Pengantar Teknologi Informasi",
+                        "sks": 2
+                    },
+                    {
+                        "nama": "Agama",
+                        "sks": 2
+                    },
+                    {
+                        "nama": "Bahasa Inggris 1",
+                        "sks": 2
+                    },
+                    {
+                        "nama": "Matematika Dasar",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Fisika Dasar",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Pancasila",
+                        "sks": 2
+                    }
+                ]
+            },
+            {
+                "subjudul": "Semester 2",
+                "matkul": [{
+                        "nama": "Algoritma dan Pemograman 2",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Sistem Basis Data",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Literasi Digital",
+                        "sks": 2
+                    },
+                    {
+                        "nama": "Organisasi & Arsitektur Komputer",
+                        "sks": 2
+                    },
+                    {
+                        "nama": "Bahasa Inggris 2",
+                        "sks": 2
+                    },
+                    {
+                        "nama": "Metode Numerik",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Matematika Informatika",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Kewarganegaraan",
+                        "sks": 2
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "judul": "Tahun Kedua",
+        "tipe": "semester",
+        "konten": [{
+                "subjudul": "Semester 3",
+                "matkul": [{
+                        "nama": "Pemograman Berorientasi Objek 1",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Basis Data Terdistribusi",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Sistem Operasi",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Jaringan Komputer 1",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Rekayasa Perangkat Lunak",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Statistika",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Teori Bahasa Otomata",
+                        "sks": 3
+                    }
+                ]
+            },
+            {
+                "subjudul": "Semester 4",
+                "matkul": [{
+                        "nama": "Pemograman Berorientasi Objek 2",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Object Oriented Analysis and Design (OOAD)",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Pemograman Mobile 1",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Jaringan Komputer 2",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Digital Preneurship",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Teknik Kompilasi",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Mk. Konsentrasi 1",
+                        "sks": 3
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "judul": "Tahun Ketiga",
+        "tipe": "semester",
+        "konten": [{
+                "subjudul": "Semester 5",
+                "matkul": [{
+                        "nama": "Mk. Pilihan 1",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Pemograman Web 1",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Pemograman Mobile 2",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Sistem Mikroprosessor",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Bahasa Indonesia",
+                        "sks": 2
+                    },
+                    {
+                        "nama": "Mk. Konsentrasi 2",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Mk. Konsentrasi 3",
+                        "sks": 3
+                    }
+                ]
+            },
+            {
+                "subjudul": "Semester 6",
+                "matkul": [{
+                        "nama": "Mk. Pilihan 2",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Pemograman Web 2",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Metodologi Penelitian Informatika",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Sistem Mikrokontroler",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Teknik Penulisan Literatur Ilmiah",
+                        "sks": 2
+                    },
+                    {
+                        "nama": "Mk. Konsentrasi 4",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Mk. Konsentrasi 5",
+                        "sks": 3
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "judul": "Tahun Keempat",
+        "tipe": "semester",
+        "konten": [{
+                "subjudul": "Semester 7",
+                "matkul": [{
+                        "nama": "Mk. Pilihan 3",
+                        "sks": 2
+                    },
+                    {
+                        "nama": "Artificial Intelligence",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Project Integration Methodology of Excellence (PRIME)",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Pra Skripsi",
+                        "sks": 3
+                    }
+                ]
+            },
+            {
+                "subjudul": "Semester 8",
+                "matkul": [{
+                        "nama": "Mk. Pilihan 4",
+                        "sks": 2
+                    },
+                    {
+                        "nama": "Sistem Pakar",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Kerja Praktek (Internship)",
+                        "sks": 2
+                    },
+                    {
+                        "nama": "Skripsi",
+                        "sks": 5
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "judul": "Mata Kuliah Konsentrasi",
+        "tipe": "kolom",
+        "konten": [{
+                "subjudul": "Computer & Network Security",
+                "matkul": [{
+                        "nama": "Computer Security",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Network Security",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Information Security",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Ethical Hacking",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Foresec Certified in Networking Security (FCNS)",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "CNSA (Certificate in Network Security Associate)",
+                        "sks": 3
+                    }
+                ]
+            },
+            {
+                "subjudul": "Creative Information Development",
+                "matkul": [{
+                        "nama": "Manajemen Proyek Perangkat Lunak",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Desain Kreatif Aplikasi dan Game",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Augmented & Virtual Reality",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "Pengujian Perangkat Lunak",
+                        "sks": 3
+                    },
+                    {
+                        "nama": "ADA (Android Development Associate)",
+                        "sks": 3
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "judul": "Mata Kuliah Pilihan",
+        "tipe": "kolom",
+        "konten": [{
+            "subjudul": "Mata Kuliah Pilihan",
+            "matkul": [{
+                    "nama": "Sistem Informasi",
+                    "sks": 3
+                },
+                {
+                    "nama": "Sistem Informasi Enterprise",
+                    "sks": 3
+                },
+                {
+                    "nama": "Data Mining",
+                    "sks": 3
+                },
+                {
+                    "nama": "Big Data",
+                    "sks": 3
+                },
+                {
+                    "nama": "Info Grafis",
+                    "sks": 3
+                },
+                {
+                    "nama": "Multimedia & Animasi",
+                    "sks": 3
+                },
+                {
+                    "nama": "Personal Development",
+                    "sks": 2
+                },
+                {
+                    "nama": "Profesional Development",
+                    "sks": 2
+                },
+                {
+                    "nama": "Human Relationship",
+                    "sks": 2
+                },
+                {
+                    "nama": "Etika Profesi",
+                    "sks": 2
+                }
+            ]
+        }]
+    }
+]

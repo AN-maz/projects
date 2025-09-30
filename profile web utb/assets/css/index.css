@@ -1,11 +1,13 @@
 /* Import partials */
 @import "partials/_nav.css";
 @import "partials/_main.css";
+@import "partials/_rencana-studi.css";
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    scroll-behavior: smooth;
 }
 
 body {
