@@ -2,6 +2,7 @@
 @import "partials/_nav.css";
 @import "partials/_main.css";
 @import "partials/_rencana-studi.css";
+@import "partials/_pengajar.css";
 
 * {
     margin: 0;

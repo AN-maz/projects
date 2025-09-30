@@ -1,0 +1,19 @@
+.pengajar {
+    padding-top: 6em;
+    /* display: flex; */
+}
+
+.pengajar p {
+    text-align: justify;
+    padding-bottom: 1em;
+}
+
+.pengajar h1 {
+    padding-bottom: 1em;
+}
+
+.kadev{
+    display: flex;
+    /* align-items: flex-start; */
+    gap: 3em;
+}
